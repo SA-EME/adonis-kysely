@@ -1,0 +1,74 @@
+{
+  "name": "adonis-kysely",
+  "description": "A kysely package to help adonisjs project",
+  "version": "0.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.8.0"
+  },
+  "main": "build/index.js",
+  "type": "module",
+  "files": [
+    "build/src",
+    "build/providers",
+    "build/stubs",
+    "build/index.d.ts",
+    "build/index.js",
+    "build/configure.d.ts",
+    "build/configure.js"
+  ],
+  "exports": {
+    ".": "./build/index.js",
+    "./types": "./build/src/types.js"
+  },
+  "scripts": {
+    "build": "npm run compile",
+    "clean": "del-cli build",
+    "compile": "npm run clean && tsc"
+  },
+  "imports": {
+    "#providers/*": "./providers/*.js",
+    "#database/*": "./database/*.js",
+    "#start/*": "./start/*.js",
+    "#tests/*": "./tests/*.js",
+    "#config/*": "./config/*.js"
+  },
+  "devDependencies": {
+    "@adonisjs/assembler": "^7.8.2",
+    "@adonisjs/core": "^6.18.0",
+    "@adonisjs/eslint-config": "^2.0.0",
+    "@adonisjs/prettier-config": "^1.4.4",
+    "@adonisjs/tsconfig": "^1.4.0",
+    "@japa/assert": "^4.0.1",
+    "@japa/plugin-adonisjs": "^4.0.0",
+    "@japa/runner": "^4.2.0",
+    "@swc/core": "1.11.24",
+    "@types/node": "^22.15.18",
+    "del-cli": "^6.0.0",
+    "eslint": "^9.26.0",
+    "hot-hook": "^0.4.0",
+    "pino-pretty": "^13.0.0",
+    "prettier": "^3.5.3",
+    "ts-node-maintained": "^10.9.5",
+    "typescript": "~5.8"
+  },
+  "dependencies": {
+    "kysely": "^0.28.2"
+  },
+  "peerDependencies": {
+    "@adonisjs/core": "^6.2.0"
+  },
+  "author": "Kalvin VILLA <kalvin.villa@pm.me>",
+  "license": "MIT",
+  "keywords": ["kysely", "database"],
+  "hotHook": {
+    "boundaries": [
+      "./app/controllers/**/*.ts",
+      "./app/middleware/*.ts"
+    ]
+  },
+  "eslintConfig": {
+    "extends": "@adonisjs/eslint-config/app"
+  },
+  "prettier": "@adonisjs/prettier-config"
+}
