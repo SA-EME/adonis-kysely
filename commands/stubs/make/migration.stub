@@ -1,0 +1,19 @@
+{{{
+  exports({
+    to: app.migrationsPath(entity.path, migration.fileName)
+  })
+}}}
+import type { Kysely } from 'kysely'
+
+export async function up(db: Kysely<any>): Promise<void> {
+  await db.schema
+    .createTable('{{ migration.tableName }}')
+    .addColumn('id', 'uuid', (col) => col.primaryKey())
+    .addColumn('created_at', 'timestamptz', (col) => col.notNull())
+    .addColumn('updated_at', 'timestamptz')
+    .execute()
+}
+
+export async function down(db: Kysely<any>): Promise<void> {
+  await db.schema.dropTable('{{ migration.tableName }}').execute()
+}

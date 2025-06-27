@@ -2,31 +2,50 @@
   "name": "adonis-kysely",
   "description": "A kysely package to help adonisjs project",
   "version": "0.0.0",
-  "private": true,
   "engines": {
     "node": ">=22.8.0"
   },
   "main": "build/index.js",
   "type": "module",
   "files": [
-    "build/src",
+    "src",
+    "types",
+    "build/commands",
     "build/providers",
+    "build/services",
+    "build/src",
     "build/stubs",
-    "build/index.d.ts",
     "build/index.js",
-    "build/configure.d.ts",
-    "build/configure.js"
+    "build/index.d.ts",
+    "build/configure.js",
+    "build/configure.d.ts"
   ],
   "exports": {
     ".": "./build/index.js",
-    "./types": "./build/src/types.js"
+    "./services/main": "./build/services/kysely.js",
+    "./commands": "./build/commands/main.js",
+    "./commands/*": "./build/commands/*.js",
+    "./types": "./build/src/types.js",
+    "./kysely_provider": "./build/providers/kysely_provider.js",
+    "./types/db": {
+      "types": "./types/db.d.ts",
+      "default": "./types/db.d.ts"
+    }
   },
   "scripts": {
-    "build": "npm run compile",
+    "index:commands": "adonis-kit index build/commands",
+    "build": "npm run lint && npm run clean && npm run build-only && npm run copyfiles && npm run index:commands",
+    "dev": "npm unlink && npm run build && npm link",
+    "build-only": "tsc",
     "clean": "del-cli build",
-    "compile": "npm run clean && tsc"
+    "copyfiles": "copyfiles \"stubs/**/**/*.stub\" build",
+    "format": "prettier --write .",
+    "lint": "eslint .",
+    "release": "npx release-it",
+    "prepublishOnly": "npm run build"
   },
   "imports": {
+    "#src/*": "./src/*.js",
     "#providers/*": "./providers/*.js",
     "#database/*": "./database/*.js",
     "#start/*": "./start/*.js",
@@ -44,23 +63,31 @@
     "@japa/runner": "^4.2.0",
     "@swc/core": "1.11.24",
     "@types/node": "^22.15.18",
+    "@types/pg": "^8.15.4",
+    "copyfiles": "^2.4.1",
     "del-cli": "^6.0.0",
     "eslint": "^9.26.0",
     "hot-hook": "^0.4.0",
+    "pg": "^8.16.2",
     "pino-pretty": "^13.0.0",
     "prettier": "^3.5.3",
     "ts-node-maintained": "^10.9.5",
     "typescript": "~5.8"
   },
   "dependencies": {
-    "kysely": "^0.28.2"
+    "@poppinss/utils": "^6.7.3",
+    "kysely": "^0.28.2",
+    "kysely-codegen": "^0.18.5"
   },
   "peerDependencies": {
     "@adonisjs/core": "^6.2.0"
   },
   "author": "Kalvin VILLA <kalvin.villa@pm.me>",
   "license": "MIT",
-  "keywords": ["kysely", "database"],
+  "keywords": [
+    "kysely",
+    "database"
+  ],
   "hotHook": {
     "boundaries": [
       "./app/controllers/**/*.ts",

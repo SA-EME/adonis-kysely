@@ -1,0 +1,4 @@
+{{{
+  exports({ to: app.makePath('./types/db.ts') })
+}}}
+export interface DB {}

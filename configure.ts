@@ -12,6 +12,21 @@
 |
 */
 
-import ConfigureCommand from '@adonisjs/core/commands/configure'
+import type ConfigureCommand from '@adonisjs/core/commands/configure'
+import { stubsRoot } from './stubs/main.js'
 
-export async function configure(_command: ConfigureCommand) {}
+export async function configure(command: ConfigureCommand) {
+  const codemods = await command.createCodemods()
+
+  await codemods.makeUsingStub(stubsRoot, 'config/kysely.stub', {})
+  // TODO, find a way to use rootPath
+  await codemods.makeUsingStub(stubsRoot, 'types/db.stub', {})
+
+  await codemods.defineEnvVariables({
+    DATABASE_URL: '[postgres]://[postgres]:[postgres]@127.0.0.1:[5432]/[table]',
+  })
+
+  await codemods.updateRcFile((rcFile) => {
+    rcFile.addCommand('adonis-kysely/commands').addProvider('adonis-kysely/kysely_provider')
+  })
+}

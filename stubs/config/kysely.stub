@@ -1,0 +1,26 @@
+{{{
+  exports({ to: app.configPath('kysely.ts') })
+}}}
+import pg from 'pg'
+
+import env from '#start/env'
+import { defineConfig } from 'adonis-kysely'
+import { PostgresDialect } from 'kysely'
+
+const { Pool } = pg
+
+const pool = new Pool({
+  host: env.get('DB_HOST'),
+  user: env.get('DB_USER'),
+  password: env.get('DB_PASSWORD'),
+  database: env.get('DB_DATABASE'),
+  max: 20,
+})
+
+const dialect = new PostgresDialect({
+  pool,
+})
+
+export default defineConfig({
+  dialect,
+})
