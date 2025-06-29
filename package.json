@@ -77,7 +77,8 @@
   "dependencies": {
     "@poppinss/utils": "^6.7.3",
     "kysely": "^0.28.2",
-    "kysely-codegen": "^0.18.5"
+    "kysely-codegen": "^0.18.5",
+    "uuid": "^11.1.0"
   },
   "peerDependencies": {
     "@adonisjs/core": "^6.2.0"
