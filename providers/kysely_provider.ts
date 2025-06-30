@@ -1,8 +1,9 @@
 import type { ApplicationService } from '@adonisjs/core/types'
 import type { AdonisKyselyConfig } from '../src/types/main.js'
 import type { AdonisKyselyDB } from '../src/kysely_db.js'
+import { TransactionContext } from '../src/transaction_context.js'
 
-export default class QueueProvider {
+export default class KyselyProvider {
   #kysely: AdonisKyselyDB | null = null
 
   constructor(protected app: ApplicationService) {}
@@ -13,8 +14,9 @@ export default class QueueProvider {
 
       const config = this.app.config.get<AdonisKyselyConfig>('kysely')
       const logger = await this.app.container.make('logger')
+      const transaction = new TransactionContext()
 
-      this.#kysely = new AdonisKyselyDB(this.app, logger, config)
+      this.#kysely = new AdonisKyselyDB(this.app, logger, config, transaction)
 
       return this.#kysely
     })
