@@ -23,6 +23,7 @@
   "exports": {
     ".": "./build/index.js",
     "./services/main": "./build/services/kysely.js",
+    "./services/transaction": "./build/services/transaction.js",
     "./commands": "./build/commands/main.js",
     "./commands/*": "./build/commands/*.js",
     "./types": "./build/src/types.js",

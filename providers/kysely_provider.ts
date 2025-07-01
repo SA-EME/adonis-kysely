@@ -20,6 +20,12 @@ export default class KyselyProvider {
 
       return this.#kysely
     })
+
+    this.app.container.singleton('adonis-kysely:transaction-runner', async () => {
+      const { ScopedTransactionRunner } = await import('../src/transaction_runner.js')
+      const kysely = await this.app.container.make('adonis-kysely')
+      return new ScopedTransactionRunner(kysely)
+    })
   }
 
   async shutdown() {}

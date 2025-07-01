@@ -51,7 +51,7 @@ npx kysely-codegen --out-file=types/db.ts
 
 
 #### Kysely db object
-`getConnexion` permit to access to kysely db object
+`getConnexion` permit to access to kysely db object, every sql query need to pass by this object, to enable use of the transaction system 
 
 ```javascript
 import kyselyDB from 'adonis-kysely/services/main'
@@ -84,26 +84,20 @@ await kyselyDB.runInTransaction(async () => {
 
 
 ```javascript
-import kyselyDB from 'adonis-kysely/services/main'
+import transaction from 'adonis-kysely/services/transaction'
 
-const transaction = await kyselyDB.startTransaction()
-
-if (!transaction) return
-
-await kyselyDB.getContext().run(transaction, async () => {
+const trx = await transaction.start()
+await trx?.run(async () => {
   await this.userRepository.create({
     displayName: 'test',
-    email: 'test@example.com'),
+    email: 'test@example.com',
     password: '',
   })
 
   const users = await this.userRepository.all()
 })
 
-await sleep(3000)
-await kyselyDB.getContext().run(transaction, async () => {
-  await kyselyDB.rollbackTransaction(transaction)
-})
+await trx?.rollback()
 
 ```
 
