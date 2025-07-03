@@ -33,8 +33,10 @@ export class AdonisKyselyDB {
     this.#transactions = new Map()
 
     const dialect = this.#options.dialect
+    const log = this.#options.log
     this.#kyselyDB = new Kysely<DB>({
       dialect,
+      log,
     })
   }
 

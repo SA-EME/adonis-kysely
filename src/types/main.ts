@@ -1,5 +1,6 @@
-import type { PostgresDialect } from 'kysely'
+import type { LogConfig, PostgresDialect } from 'kysely'
 
 export type AdonisKyselyConfig = {
   dialect: PostgresDialect
+  log?: LogConfig
 }
