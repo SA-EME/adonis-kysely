@@ -12,7 +12,6 @@ export class AdonisKyselyDB {
   #kyselyDB: Kysely<DB>
   // @ts-ignore
   #app: ApplicationService
-  // @ts-ignore
   #logger: LoggerService
   #options: AdonisKyselyConfig
 
@@ -100,6 +99,7 @@ export class AdonisKyselyDB {
    * @returns string
    */
   async startTransaction() {
+    // TODO transaction don't seem work with sqlite, the transaction start but the querie are blocked
     if (this.isTestMode()) {
       if (this.#testTransaction) return
 
@@ -148,6 +148,28 @@ export class AdonisKyselyDB {
         await transaction.rollback().execute()
         this.#transactions.delete(id)
       }
+    }
+  }
+
+  async destroy() {
+    try {
+      for (const [id, trx] of this.#transactions.entries()) {
+        try {
+          await trx.rollback().execute()
+        } catch {}
+        this.#transactions.delete(id)
+      }
+
+      if (this.#testTransaction) {
+        try {
+          await this.#testTransaction.rollback().execute()
+        } catch {}
+        this.#testTransaction = null
+      }
+
+      await this.#kyselyDB.destroy()
+    } catch (err) {
+      this.#logger.error(`[AdonisKysely] Failed to destroy DB: ${err.message}`)
     }
   }
 
