@@ -34,6 +34,7 @@ export class AdonisKyselyDB {
     const dialect = this.#options.dialect
     this.#kyselyDB = new Kysely<DB>({
       dialect,
+      log: this.#options.log,
     })
   }
 

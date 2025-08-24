@@ -36,3 +36,10 @@ export interface EnvironmentValidations {
   variables: Record<string, string>
   leadingComment?: string
 }
+
+export type LoggingOption = 'none' | 'console' | 'adonisjs-logger' | 'custom'
+
+export interface LoggingChoice {
+  name: LoggingOption
+  message: string
+}

@@ -1,0 +1,40 @@
+{{{
+  exports({ to: app.configPath('logs/kysely.ts') })
+}}}
+
+import type { LogEvent } from 'kysely'
+import logger from '@adonisjs/core/services/logger'
+
+/**
+ * Kysely logging configuration
+ * 
+ * You can customize how database queries are logged by modifying the function below.
+ * Available log levels: 'query', 'error'
+ */
+
+export function createKyselyLogger() {
+  return (event: LogEvent): void => {
+    if (event.level === 'query') {
+      logger.debug(
+        'Query executed in ' + event.queryDurationMillis + 'ms: ' + event.query.sql,
+        {
+          sql: event.query.sql,
+          parameters: event.query.parameters,
+          duration: event.queryDurationMillis,
+        }
+      )
+    }
+
+    if (event.level === 'error') {
+      logger.error('Query execution error', {
+        sql: event.query.sql,
+        parameters: event.query.parameters,
+        error: event.error,
+        duration: event.queryDurationMillis,
+      })
+    }
+  }
+}
+
+// For simple logging, you can also export log levels directly:
+// export const simpleLogger: LogLevel[] = ['query', 'error']

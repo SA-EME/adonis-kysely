@@ -4,6 +4,7 @@ import {
   selectDialect,
   collectSqliteConfig,
   collectNetworkDatabaseConfig,
+  selectLoggingOption,
 } from './src/configure/dialect_handler.js'
 import {
   getRequiredPackages,
@@ -26,6 +27,8 @@ export async function configure(command: ConfigureCommand) {
     databaseConfig = await collectNetworkDatabaseConfig(command, dialect)
   }
 
+  const loggingOption = await selectLoggingOption(command)
+
   const shouldInstallPackages = await confirmPackageInstallation(command)
   const requiredPackages = getRequiredPackages(dialect)
 
@@ -35,6 +38,6 @@ export async function configure(command: ConfigureCommand) {
 
   await setupEnvironmentVariables(codemods, dialect, databaseConfig)
 
-  await generateConfigurationFiles(codemods, stubsRoot, dialect)
+  await generateConfigurationFiles(codemods, stubsRoot, dialect, loggingOption)
   await updateRcFile(codemods)
 }
