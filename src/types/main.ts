@@ -1,5 +1,5 @@
-import type { PostgresDialect } from 'kysely'
+import type { PostgresDialect, SqliteDialect, MysqlDialect } from 'kysely'
 
 export type AdonisKyselyConfig = {
-  dialect: PostgresDialect
+  dialect: PostgresDialect | SqliteDialect | MysqlDialect
 }

@@ -1,0 +1,15 @@
+{{{
+  exports({ to: app.configPath('kysely.ts') })
+}}}
+
+import Database from 'better-sqlite3'
+import env from '#start/env'
+import { defineConfig } from 'adonis-kysely'
+import { SqliteDialect } from 'kysely'
+
+const db = new Database(env.get('DB_PATH'))
+const dialect = new SqliteDialect({ database: db })
+
+export default defineConfig({
+  dialect,
+})

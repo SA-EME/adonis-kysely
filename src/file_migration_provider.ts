@@ -49,7 +49,6 @@ function isMigration(obj: unknown): obj is Migration {
   return isObject(obj) && isFunction(obj.up)
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
 function isFunction(obj: unknown): obj is Function {
   return typeof obj === 'function'
 }
