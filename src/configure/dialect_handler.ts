@@ -97,11 +97,12 @@ function validatePortNumber(value: string): boolean | string {
     : 'Please enter a valid port number between 1 and 65535'
 }
 
+// TODO; custom will be implemented in future
 const LOGGING_CHOICES: LoggingChoice[] = [
   { name: 'none', message: 'No logging' },
   { name: 'console', message: 'Console logging (development)' },
   { name: 'adonisjs-logger', message: 'AdonisJS Logger (recommended)' },
-  { name: 'custom', message: 'Custom logging setup' },
+  { name: 'custom', message: 'Custom logging setup (wip)' },
 ]
 
 export async function selectLoggingOption(command: ConfigureCommand): Promise<LoggingOption> {
