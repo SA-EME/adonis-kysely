@@ -33,6 +33,7 @@ export function generateEnvironmentValidations(dialect: SupportedDialect): Envir
       variables: {
         DB_PATH: 'Env.schema.string()',
       },
+      leadingComment: 'Variables for configuring the database connection',
     }
   }
 

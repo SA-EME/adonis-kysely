@@ -6,6 +6,9 @@ import { createPool } from 'mysql2'
 import env from '#start/env'
 import { defineConfig } from 'adonis-kysely'
 import { MysqlDialect } from 'kysely'
+{{#if hasLogging}}
+import { createKyselyLogger } from '#config/logs/kysely'
+{{/if}}
 
 const pool = createPool({
   host: env.get('DB_HOST'),
@@ -19,5 +22,6 @@ const pool = createPool({
 const dialect = new MysqlDialect({ pool })
 
 export default defineConfig({
-  dialect,
+  dialect,{{#if hasLogging}}
+  log: createKyselyLogger(),{{/if}}
 })

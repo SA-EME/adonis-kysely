@@ -1,13 +1,20 @@
 import type ConfigureCommand from '@adonisjs/core/commands/configure'
-import type { SupportedDialect } from '../types/configure.js'
+import type { SupportedDialect, LoggingOption } from '../types/configure.js'
 
 export async function generateConfigurationFiles(
   codemods: Awaited<ReturnType<ConfigureCommand['createCodemods']>>,
   stubsRoot: string,
-  dialect: SupportedDialect
+  dialect: SupportedDialect,
+  loggingOption: LoggingOption
 ): Promise<void> {
-  await codemods.makeUsingStub(stubsRoot, `config/kysely_${dialect}.stub`, {})
+  const hasLogging = loggingOption !== 'none'
+
+  await codemods.makeUsingStub(stubsRoot, `config/kysely_${dialect}.stub`, { hasLogging })
   await codemods.makeUsingStub(stubsRoot, 'types/db.stub', {})
+
+  if (hasLogging) {
+    await codemods.makeUsingStub(stubsRoot, 'config/logs.stub', {})
+  }
 }
 
 export async function updateRcFile(

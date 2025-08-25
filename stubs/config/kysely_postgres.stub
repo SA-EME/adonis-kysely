@@ -6,6 +6,9 @@ import pg from 'pg'
 import env from '#start/env'
 import { defineConfig } from 'adonis-kysely'
 import { PostgresDialect } from 'kysely'
+{{#if hasLogging}}
+import { createKyselyLogger } from '#config/logs/kysely'
+{{/if}}
 
 const { Pool } = pg
 
@@ -20,5 +23,6 @@ const pool = new Pool({
 const dialect = new PostgresDialect({ pool })
 
 export default defineConfig({
-  dialect,
+  dialect,{{#if hasLogging}}
+  log: createKyselyLogger(),{{/if}}
 })

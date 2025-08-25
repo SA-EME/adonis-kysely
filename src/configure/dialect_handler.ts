@@ -1,5 +1,11 @@
 import type ConfigureCommand from '@adonisjs/core/commands/configure'
-import type { SupportedDialect, DatabaseConfig, DialectChoice } from '../types/configure.js'
+import type {
+  SupportedDialect,
+  DatabaseConfig,
+  DialectChoice,
+  LoggingOption,
+  LoggingChoice,
+} from '../types/configure.js'
 
 const DIALECT_CHOICES: DialectChoice[] = [
   { name: 'postgres', message: 'Postgres' },
@@ -89,4 +95,23 @@ function validatePortNumber(value: string): boolean | string {
   return !Number.isNaN(port) && port > 0 && port < 65536
     ? true
     : 'Please enter a valid port number between 1 and 65535'
+}
+
+// TODO; custom will be implemented in future
+const LOGGING_CHOICES: LoggingChoice[] = [
+  { name: 'none', message: 'No logging' },
+  { name: 'console', message: 'Console logging (development)' },
+  { name: 'adonisjs-logger', message: 'AdonisJS Logger (recommended)' },
+  { name: 'custom', message: 'Custom logging setup (wip)' },
+]
+
+export async function selectLoggingOption(command: ConfigureCommand): Promise<LoggingOption> {
+  return await command.prompt.choice(
+    'What logging option would you like to use for database queries?',
+    LOGGING_CHOICES,
+    {
+      name: 'logging',
+      default: 'adonisjs-logger',
+    }
+  )
 }
