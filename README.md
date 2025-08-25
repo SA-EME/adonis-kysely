@@ -1,16 +1,11 @@
 <h1 align="center">Adonis kysely package</h1>
 
-`adonis-kysely` package is a package for easy configuration of [kysely](https://github.com/kysely-org/kysely) on [adonisjs](https://github.com/adonisjs).
+`adonis-kysely` is a package for easy configuration of [kysely](https://github.com/kysely-org/kysely) on [adonisjs](https://github.com/adonisjs).
 
 ## WIP: This project is currently under development, with no version available at the moment.
 
 - If you want to try out the package, the only way is to compile it from this repository, see [build section](https://github.com/SA-EME/adonis-kysely).
 - ⚠ Please note that this package is under development and may contain bugs. If you encounter any, do not hesitate to open an issue.
-- ⚠ It only works with PostgreSQL at this moment.
-
-## Prerequire
-- Need to have configured [database system](https://docs.adonisjs.com/guides/database/introduction)
-
 
 ## Usage
 
@@ -32,10 +27,6 @@ For the moment, you need to add this configuration to the tsconfig.json file, in
 }
 ```
 
-You need to generate the type from your database
-
-- Modify `DATABASE_URL` in .env file
-
 And run the command to generate the type
 
 ```sh
@@ -49,9 +40,9 @@ npx kysely-codegen --out-file=types/db.ts
 - [Controlled transaction](#controlled-transaction)
 - [Integrate in test](#integrate-in-test)
 
-
 #### Kysely db object
-`getConnexion` permit to access to kysely db object, every sql query need to pass by this object, to enable use of the transaction system 
+
+`getConnexion` permit to access to kysely db object, every sql query need to pass by this object, to enable use of the transaction system
 
 ```javascript
 import kyselyDB from 'adonis-kysely/services/main'
@@ -60,6 +51,7 @@ const user = await kyselyDB.getConnexion().selectFrom('users').selectAll().execu
 ```
 
 #### Transaction
+
 With `runInTransaction` you will not able to rollback the transaction manually.
 This function commit if any error & rollback in case of error
 
@@ -78,10 +70,10 @@ await kyselyDB.runInTransaction(async () => {
 ```
 
 #### Controlled transaction
+
 `startTransaction` permit to start a transaction, after you can use `getContext().run(uuidTransaction, callback)` to execute what you want inside the transaction
 
-⚠ *only one instance of startTransaction can be started, otherwise it generates an error*
-
+⚠ _only one instance of startTransaction can be started, otherwise it generates an error_
 
 ```javascript
 import transaction from 'adonis-kysely/services/transaction'
@@ -98,10 +90,10 @@ await trx?.run(async () => {
 })
 
 await trx?.rollback()
-
 ```
 
 #### Integrate in test
+
 During the test, you will never add sql to the database, all the database function will use test transaction.
 
 ```javascript
