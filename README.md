@@ -1,21 +1,33 @@
-<h1 align="center">Adonis kysely package</h1>
+<h1 align="center">Adonis Kysely</h1>
 
-`adonis-kysely` is a package for easy configuration of [kysely](https://github.com/kysely-org/kysely) on [adonisjs](https://github.com/adonisjs).
+<p align="center">
+  A seamless integration of <a href="https://github.com/kysely-org/kysely">Kysely</a> (type-safe SQL query builder) with <a href="https://github.com/adonisjs">AdonisJS</a> framework.
+</p>
 
-## WIP: This project is currently under development, with no version available at the moment.
+## Features
 
-- If you want to try out the package, the only way is to compile it from this repository, see [build section](https://github.com/SA-EME/adonis-kysely).
-- ⚠ Please note that this package is under development and may contain bugs. If you encounter any, do not hesitate to open an issue.
+- ✅ **Type-Safe Queries**: Full TypeScript support with database schema types
+- ✅ **Transaction Management**: Automatic and manual transaction modes with nested transaction support
+- ✅ **Repository Pattern**: Clean, testable database layer architecture
+- ✅ **Test Integration**: Automatic transaction wrapping for isolated tests
+- ✅ **Migration & Seeding**: Kysely-based migrations and flexible seeding system
+- ✅ **PostgreSQL Support**: Optimized for PostgreSQL databases
 
-## Usage
+## Installation
 
-### 1. Configure package
-
-```
+```bash
 node ace configure adonis-kysely
 ```
 
-For the moment, you need to add this configuration to the tsconfig.json file, in order to obtain the type from the database.
+This will:
+- Create `config/kysely.ts` configuration file
+- Create `types/db.ts` stub for database types
+- Add `DATABASE_URL` environment variable
+- Register provider and commands in `.adonisrc.ts`
+
+### Generate Database Types
+
+Add to your `tsconfig.json`:
 
 ```json
 {
@@ -27,132 +39,78 @@ For the moment, you need to add this configuration to the tsconfig.json file, in
 }
 ```
 
-And run the command to generate the type
+Generate TypeScript types from your database schema:
 
-```sh
+```bash
 npx kysely-codegen --out-file=types/db.ts
 ```
 
-### 2. Using package
+## Documentation
 
-- [Kysely db](#basic-request)
-- [Transaction](#transaction)
-- [Controlled transaction](#controlled-transaction)
-- [Integrate in test](#integrate-in-test)
+📖 **Comprehensive guides available:**
 
-#### Kysely db object
+- **[Usage Guide](./docs/usage.md)** - Application usage, repository pattern, transaction modes
+- **[Testing Guide](./docs/testing.md)** - Test setup, transaction wrapping, examples
+- **[Migrations & Seeders](./docs/migrations-and-seeders.md)** - Database migrations, seeding, type generation
 
-`getConnexion` permit to access to kysely db object, every sql query need to pass by this object, to enable use of the transaction system
+## Key Concepts
 
-```javascript
-import kyselyDB from 'adonis-kysely/services/main'
+### Transaction Modes
 
-const user = await kyselyDB.getConnexion().selectFrom('users').selectAll().execute()
+| Mode | When to Use |
+|------|-------------|
+| `runInTransaction()` | Simple, single-level transactions with automatic commit/rollback |
+| `startTransaction()` | Manual control, nested transactions (savepoints), partial rollbacks |
+
+### Repository Pattern
+
+Always use `kyselyDB.getConnexion()` in your repositories to ensure transaction-aware queries:
+
+```typescript
+// ✅ Correct - transaction aware
+kyselyDB.getConnexion().selectFrom('users').selectAll()
+
+// ❌ Wrong - bypasses transaction system
+// Don't create separate Kysely instances
 ```
 
-#### Transaction
+### Test Isolation
 
-With `runInTransaction` you will not able to rollback the transaction manually.
-This function commit if any error & rollback in case of error
+Tests automatically wrap in transactions and roll back - no data persists between tests.
 
-```javascript
-import kyselyDB from 'adonis-kysely/services/main'
+## Development Status
 
-await kyselyDB.runInTransaction(async () => {
-  await this.userRepository.create({
-    displayName: 'test',
-    email: 'test@example.com',
-    password: '',
-  })
+⚠️ **Note**: This package is under active development. While functional, expect potential changes and improvements. Please report any issues you encounter.
 
-  const users = await this.userRepository.all()
-})
-```
+## Build from Source
 
-#### Controlled transaction
+### 1. Clone and Install
 
-`startTransaction` permit to start a transaction, after you can use `getContext().run(uuidTransaction, callback)` to execute what you want inside the transaction
-
-⚠ _only one instance of startTransaction can be started, otherwise it generates an error_
-
-```javascript
-import transaction from 'adonis-kysely/services/transaction'
-
-const trx = await transaction.start()
-await trx?.run(async () => {
-  await this.userRepository.create({
-    displayName: 'test',
-    email: 'test@example.com',
-    password: '',
-  })
-
-  const users = await this.userRepository.all()
-})
-
-await trx?.rollback()
-```
-
-#### Integrate in test
-
-During the test, you will never add sql to the database, all the database function will use test transaction.
-
-```javascript
-// bootstrap.ts
-```
-
-```javascript
-import { test } from '@japa/runner'
-
-import kyselyDB from 'adonis-kysely/services/main'
-
-import { UserRepository } from '#user/repositories/user_repository'
-import { CompanyRepository } from '#companies/repositories/company_repository'
-
-test.group('test with transaction', (group) => {
-  // or configure direct in test group
-  group.each.setup(async () => {
-    await kyselyDB.startTransaction()
-  })
-
-  group.each.teardown(async () => {
-    await kyselyDB.rollbackTransaction()
-  })
-
-  test('create user', async ({ assert }) => {
-    const userRepository = new UserRepository()
-    await userRepository.create({
-      displayName: 'test',
-      email: 'test@example.com'
-      password: '',
-    })
-    const users = await userRepository.all()
-    assert.lengthOf(users, 1)
-  })
-})
-
-```
-
-## Build
-
-### 1. Clone the repository
-
-```sh
+```bash
 git clone https://github.com/SA-EME/adonis-kysely
 cd adonis-kysely
+npm install
 ```
 
-### 2. Build the project
+### 2. Build Package
 
-```sh
-npm install
+```bash
 npm run build
 npm pack
 ```
 
-It generates a file like this _adonis-kysely-x.x.x.tgz_
+This generates `adonis-kysely-x.x.x.tgz`
 
-### 3. Install the package under your project
+### 3. Install in Your Project
 
-```sh
-npm install adonis-kysely-x.x.x.tgz
+```bash
+npm install path/to/adonis-kysely-x.x.x.tgz
 ```
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit issues or pull requests.
+
+## License
+
+MIT License - see [LICENSE.md](LICENSE.md) for details.
