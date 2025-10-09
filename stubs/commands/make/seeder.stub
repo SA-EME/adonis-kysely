@@ -1,0 +1,17 @@
+{{{
+  exports({
+    to: app.seedersPath(entity.path, seeder.fileName)
+  })
+}}}
+import type { DB } from 'adonis-kysely/types/db'
+import type { Kysely } from 'kysely'
+
+const tableName = '{{ seeder.tableName }}'
+
+export default async function seed(db: Kysely<DB>) {
+  try {
+    await db.insertInto(tableName).values({}).returningAll().executeTakeFirstOrThrow()
+  } catch (error) {
+    console.log('Error during the seeding file')
+  }
+}

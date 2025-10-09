@@ -3,17 +3,20 @@
     to: app.migrationsPath(entity.path, migration.fileName)
   })
 }}}
+import type { DB } from 'adonis-kysely/types/db'
 import type { Kysely } from 'kysely'
 
-export async function up(db: Kysely<any>): Promise<void> {
+const tableName = '{{ migration.tableName }}'
+
+export async function up(db: Kysely<DB>) {
   await db.schema
-    .createTable('{{ migration.tableName }}')
+    .createTable(tableName)
     .addColumn('id', 'uuid', (col) => col.primaryKey())
     .addColumn('created_at', 'timestamptz', (col) => col.notNull())
     .addColumn('updated_at', 'timestamptz')
     .execute()
 }
 
-export async function down(db: Kysely<any>): Promise<void> {
-  await db.schema.dropTable('{{ migration.tableName }}').execute()
+export async function down(db: Kysely<DB>) {
+  await db.schema.dropTable(tableName).execute()
 }
