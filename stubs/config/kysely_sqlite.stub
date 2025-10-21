@@ -16,7 +16,4 @@ const dialect = new SqliteDialect({ database: db })
 export default defineConfig({
   dialect,{{#if hasLogging}}
   log: createKyselyLogger(),{{/if}}
-  advanced: {
-    bypass_test_security: false,
-  },
 })
