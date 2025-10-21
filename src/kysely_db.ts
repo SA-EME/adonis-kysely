@@ -11,6 +11,7 @@ export class AdonisKyselyDB {
   #kyselyDB: Kysely<DB>
   #app: ApplicationService
   #logger: LoggerService
+  // @ts-ignore
   #options: AdonisKyselyConfig
   #trxContext: TransactionContext
   #transactionStack: string[] = []
