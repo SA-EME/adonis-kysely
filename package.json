@@ -50,6 +50,7 @@
   },
   "imports": {
     "#src/*": "./src/*.js",
+    "#services/*" : "./services/*.js",
     "#providers/*": "./providers/*.js",
     "#database/*": "./database/*.js",
     "#start/*": "./start/*.js",
