@@ -1,40 +1,26 @@
 # Migrations and Seeders Guide
 
-This guide covers database migrations and seeders with `adonis-kysely`.
+This guide covers database migrations and seeders patterns and examples with `adonis-kysely`.
+
+> **Note:** For CLI commands documentation, see the [Commands Guide](./commands.md).
 
 ## Table of Contents
 
 - [Migrations](#migrations)
-  - [Creating Migrations](#creating-migrations)
   - [Migration Structure](#migration-structure)
-  - [Running Migrations](#running-migrations)
   - [Migration Examples](#migration-examples)
 - [Seeders](#seeders)
-  - [Creating Seeders](#creating-seeders)
   - [Seeder Structure](#seeder-structure)
-  - [Running Seeders](#running-seeders)
   - [Seeder Organization](#seeder-organization)
   - [Advanced Seeding](#advanced-seeding)
-- [Database Type Generation](#database-type-generation)
+  - [Seeder Examples](#seeder-examples)
 - [Best Practices](#best-practices)
 
 ## Migrations
 
 Migrations allow you to version control your database schema changes.
 
-### Creating Migrations
-
-Use the AdonisJS command to generate a new migration file:
-
-```bash
-node ace make:migration create_users_table
-```
-
-This creates a timestamped file in `database/migrations/`:
-
-```
-database/migrations/1755697497022_create_users_table.ts
-```
+**Creating migrations:** See [Commands Guide - make:migration](./commands.md#makemigration)
 
 ### Migration Structure
 
@@ -58,41 +44,7 @@ export async function down(db: Kysely<any>): Promise<void> {
 }
 ```
 
-### Running Migrations
-
-Migrations run automatically in tests via `testUtils.migrate()`. For development:
-
-```typescript
-import { FileMigrationProvider, Migrator } from 'kysely'
-import { promises as fs } from 'node:fs'
-import path from 'node:path'
-import kyselyDB from 'adonis-kysely/services/main'
-
-const migrator = new Migrator({
-  db: kyselyDB.getConnexion(),
-  provider: new FileMigrationProvider({
-    fs,
-    path,
-    migrationFolder: './database/migrations',
-  }),
-})
-
-// Run all pending migrations
-const { error, results } = await migrator.migrateToLatest()
-
-if (error) {
-  console.error('Migration failed:', error)
-  process.exit(1)
-}
-
-results?.forEach((result) => {
-  if (result.status === 'Success') {
-    console.log(`✅ ${result.migrationName}`)
-  } else if (result.status === 'Error') {
-    console.error(`❌ ${result.migrationName}`)
-  }
-})
-```
+**Running migrations:** See [Commands Guide - migration:run](./commands.md#migrationrun)
 
 ### Migration Examples
 
@@ -229,18 +181,7 @@ export async function down(db: Kysely<any>): Promise<void> {
 
 Seeders populate your database with test or initial data.
 
-### Creating Seeders
-
-Create seeder files manually in `database/seeders/`:
-
-```
-database/seeders/
-├── main/                   # Production seeders
-│   └── default_roles_seeder.ts
-└── test/                   # Test seeders
-    ├── users_seeder.ts
-    └── items_seeder.ts
-```
+**Creating seeders:** See [Commands Guide - make:seeder](./commands.md#makeseeder)
 
 ### Seeder Structure
 
@@ -255,29 +196,7 @@ export default async function seed(db: Kysely<DB>) {
 }
 ```
 
-### Running Seeders
-
-#### In Tests
-
-```typescript
-import testUtils from 'adonis-kysely/services/test_utils'
-
-// Run all seeders in database/seeders/test/
-await testUtils.db().seed('test')
-```
-
-#### In Application Code
-
-```typescript
-import app from '@adonisjs/core/services/app'
-import kyselyDB from 'adonis-kysely/services/main'
-import { KyselySeeder } from 'adonis-kysely/seeder'
-
-const seeder = new KyselySeeder(kyselyDB, app)
-
-// Run seeders from specific subfolder
-await seeder.runSeeders('main')
-```
+**Running seeders:** See [Commands Guide - seed:run](./commands.md#seedrun)
 
 ### Seeder Organization
 
@@ -489,15 +408,7 @@ export default async function seed(db: Kysely<DB>) {
 
 ## Database Type Generation
 
-After creating or modifying migrations, regenerate TypeScript types:
-
-```bash
-npx kysely-codegen --out-file=types/db.ts
-```
-
-This generates type definitions based on your current database schema.
-
-### Configuration
+**Generating types:** See [Commands Guide - make:db-type](./commands.md#makedb-type)
 
 Ensure your `tsconfig.json` includes:
 
@@ -510,16 +421,6 @@ Ensure your `tsconfig.json` includes:
   }
 }
 ```
-
-### When to Regenerate Types
-
-Regenerate types after:
-- ✅ Creating new tables
-- ✅ Adding/removing columns
-- ✅ Modifying column types
-- ✅ Running new migrations
-
-This ensures your TypeScript code stays in sync with your database schema.
 
 ## Best Practices
 

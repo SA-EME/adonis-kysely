@@ -52,6 +52,7 @@ npx kysely-codegen --out-file=types/db.ts
 - **[Usage Guide](./docs/usage.md)** - Application usage, repository pattern, transaction modes
 - **[Testing Guide](./docs/testing.md)** - Test setup, transaction wrapping, examples
 - **[Migrations & Seeders](./docs/migrations-and-seeders.md)** - Database migrations, seeding, type generation
+- **[Commands Guide](./docs/commands.md)** - CLI commands (make:migration, migrate:run, migrate:rollback)
 
 ## Key Concepts
 
