@@ -1,10 +1,8 @@
-import { AdonisKyselyDB } from '#src/kysely_db'
-import { ScopedTransactionRunner } from '#src/transaction_runner'
+import { AdonisKyselyDB } from '../kysely_db.js'
 
 declare module '@adonisjs/core/types' {
   export interface ContainerBindings {
     'adonis-kysely': AdonisKyselyDB
-    'adonis-kysely:transaction-runner': ScopedTransactionRunner
   }
 }
 
