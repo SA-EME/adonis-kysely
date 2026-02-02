@@ -1,26 +1,41 @@
 import type { ApplicationService } from '@adonisjs/core/types'
 import type { AdonisKyselyConfig } from '../src/types/main.js'
-import type { AdonisKyselyDB } from '../src/kysely_db.js'
-import { TransactionContext } from '../src/transaction_context.js'
+import type { DB } from 'adonis-kysely/types/db'
+import { Kysely } from 'kysely'
+import { KyselyManager } from '../src/kysely/manager.js'
+import executionContext from '../src/context/execution_context.js'
 
 export default class KyselyProvider {
-  #kysely: AdonisKyselyDB | null = null
+  #kysely: KyselyManager | null = null
 
   constructor(protected app: ApplicationService) {}
 
   register() {
     this.app.container.singleton('adonis-kysely', async () => {
-      const { AdonisKyselyDB } = await import('../src/kysely_db.js')
-
       const config = this.app.config.get<AdonisKyselyConfig>('kysely')
-      const logger = await this.app.container.make('logger')
-      const transaction = new TransactionContext()
 
-      this.#kysely = new AdonisKyselyDB(this.app, logger, config, transaction)
+      const db = this.#createKyselyInstance(config)
+
+      this.#kysely = new KyselyManager(db)
 
       return this.#kysely
     })
+
+    this.app.container.singleton('adonis-kysely/execution-context', async () => {
+      return executionContext
+    })
   }
 
-  async shutdown() {}
+  #createKyselyInstance(config: AdonisKyselyConfig): Kysely<DB> {
+    return new Kysely<DB>({
+      dialect: config.dialect,
+      log: config.log,
+    })
+  }
+
+  async shutdown() {
+    if (this.#kysely) {
+      await this.#kysely.destroy()
+    }
+  }
 }

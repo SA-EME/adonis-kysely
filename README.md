@@ -7,11 +7,12 @@
 ## Features
 
 - ✅ **Type-Safe Queries**: Full TypeScript support with database schema types
-- ✅ **Transaction Management**: Automatic and manual transaction modes with nested transaction support
+- ✅ **Execution Context**: Request-scoped data with PostgreSQL RLS support
+- ✅ **Transaction Management**: Automatic transactions with nested savepoint support
 - ✅ **Repository Pattern**: Clean, testable database layer architecture
 - ✅ **Test Integration**: Automatic transaction wrapping for isolated tests
 - ✅ **Migration & Seeding**: Kysely-based migrations and flexible seeding system
-- ✅ **PostgreSQL Support**: Optimized for PostgreSQL databases
+- ✅ **PostgreSQL Support**: Optimized for PostgreSQL with `set_config()` integration
 
 ## Installation
 
@@ -49,35 +50,50 @@ npx kysely-codegen --out-file=types/db.ts
 
 📖 **Comprehensive guides available:**
 
-- **[Usage Guide](./docs/usage.md)** - Application usage, repository pattern, transaction modes
-- **[Testing Guide](./docs/testing.md)** - Test setup, transaction wrapping, examples
-- **[Migrations & Seeders](./docs/migrations-and-seeders.md)** - Database migrations, seeding, type generation
-- **[Commands Guide](./docs/commands.md)** - CLI commands (make:migration, migrate:run, migrate:rollback)
+- **[Usage Guide](./docs/usage.md)** - Repository pattern, transactions, getting started
+- **[Context Guide](./docs/context.md)** - Execution context, request-scoped data, PostgreSQL RLS
+- **[Testing Guide](./docs/testing.md)** - Test setup, transaction wrapping, isolation
+- **[Migrations & Seeders](./docs/migrations-and-seeders.md)** - Database migrations, seeding
+- **[Commands Guide](./docs/commands.md)** - CLI commands
 
 ## Key Concepts
 
-### Transaction Modes
+### Execution Context
 
-| Mode | When to Use |
-|------|-------------|
-| `runInTransaction()` | Simple, single-level transactions with automatic commit/rollback |
-| `startTransaction()` | Manual control, nested transactions (savepoints), partial rollbacks |
+Wrap entry points (HTTP, CLI, jobs) in `dbContext.run()`:
+
+```typescript
+import { dbContext } from 'adonisjs-kysely/services/main'
+
+await dbContext.run(async () => {
+  // All DB operations here share the same context
+})
+```
+
+### Transactions
+
+Use `runInTransaction()` for atomic operations:
+
+```typescript
+await kyselyDB.runInTransaction(async () => {
+  await createUser()
+  await createRole()
+  // Commits on success, rolls back on error
+})
+```
 
 ### Repository Pattern
 
-Always use `kyselyDB.getConnexion()` in your repositories to ensure transaction-aware queries:
+Always use `kyselyDB.getConnexion()` - call fresh each time:
 
 ```typescript
 // ✅ Correct - transaction aware
 kyselyDB.getConnexion().selectFrom('users').selectAll()
-
-// ❌ Wrong - bypasses transaction system
-// Don't create separate Kysely instances
 ```
 
 ### Test Isolation
 
-Tests automatically wrap in transactions and roll back - no data persists between tests.
+Tests wrap in transactions and auto-rollback - no data persists between tests.
 
 ## Development Status
 

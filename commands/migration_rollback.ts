@@ -1,5 +1,5 @@
 import type { CommandOptions } from '@adonisjs/core/types/ace'
-import type { AdonisKyselyDB } from '#src/kysely_db'
+import type { KyselyManager } from '#src/kysely_db'
 
 import * as fs from 'node:fs/promises'
 import * as path from 'node:path'
@@ -20,7 +20,7 @@ export default class MigrateRollback extends BaseCommand {
 
   declare migrator: Migrator
 
-  declare database: AdonisKyselyDB
+  declare database: KyselyManager
 
   /**
    * Prepare lifecycle hook runs before the "run" method
@@ -28,7 +28,7 @@ export default class MigrateRollback extends BaseCommand {
    * instance
    */
   async prepare() {
-    this.database = (await this.app.container.make('adonis-kysely')) as AdonisKyselyDB
+    this.database = (await this.app.container.make('adonis-kysely')) as KyselyManager
     this.migrator = new Migrator({
       db: this.database.getConnexion(),
       provider: new FileMigrationProvider({

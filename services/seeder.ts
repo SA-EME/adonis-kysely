@@ -1,1 +1,1 @@
-export { KyselySeeder } from '../src/seeder.js'
+export { KyselySeeder } from '../src/seeder/seeder.js'

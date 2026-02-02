@@ -1,8 +1,8 @@
-import type { AdonisKyselyDB } from '../src/kysely_db.js'
-import { KyselyTestUtils } from '../src/test_utils.js'
+import type { KyselyManager } from '../src/kysely/manager.js'
+import { KyselyTestUtils } from '../src/testing/test_utils.js'
 import app from '@adonisjs/core/services/app'
 
-let kyselyDB: AdonisKyselyDB
+let kyselyDB: KyselyManager
 let kyselyTestUtils: KyselyTestUtils
 if (app) {
   await app.booted(async () => {

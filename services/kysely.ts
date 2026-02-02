@@ -1,7 +1,7 @@
-import type { AdonisKyselyDB } from '../src/kysely_db.js'
+import type { KyselyManager } from '../src/kysely/manager.js'
 import app from '@adonisjs/core/services/app'
 
-let kyselyDB: AdonisKyselyDB
+let kyselyDB: KyselyManager
 if (app) {
   await app.booted(async () => {
     kyselyDB = await app.container.make('adonis-kysely')

@@ -1,8 +1,10 @@
-import { AdonisKyselyDB } from '../kysely_db.js'
+import { KyselyManager } from '../kysely/manager.js'
+import { ExecutionContext } from '../context/execution_context.js'
 
 declare module '@adonisjs/core/types' {
   export interface ContainerBindings {
-    'adonis-kysely': AdonisKyselyDB
+    'adonis-kysely': KyselyManager
+    'adonis-kysely/execution-context': ExecutionContext
   }
 }
 

@@ -1,7 +1,7 @@
 {
-  "name": "adonis-kysely",
+  "name": "adonisjs-kysely",
   "description": "A kysely package to help adonisjs project",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "engines": {
     "node": ">=22.8.0"
   },
@@ -23,7 +23,8 @@
   "exports": {
     ".": "./build/index.js",
     "./services/main": "./build/services/kysely.js",
-    "./services/transaction": "./build/services/transaction.js",
+    "./services/db_context": "./build/services/db_context.js",
+    "./services/execution_context": "./build/services/execution_context.js",
     "./services/seeder": "./build/services/seeder.js",
     "./services/test_utils": "./build/services/test_utils.js",
     "./commands": "./build/commands/main.js",

@@ -6,11 +6,11 @@ This guide covers how to use `adonis-kysely` in your AdonisJS application to per
 
 - [Installation](#installation)
 - [Configuration](#configuration)
+- [Execution Context](#execution-context)
 - [Repository Pattern](#repository-pattern)
 - [Basic Database Operations](#basic-database-operations)
 - [Transaction Management](#transaction-management)
-  - [Automatic Transactions](#automatic-transactions-runintransaction)
-  - [Manual Nested Transactions](#manual-nested-transactions-starttransaction)
+- [Request-Scoped Data](#request-scoped-data)
 - [Best Practices](#best-practices)
 
 ## Installation
@@ -73,9 +73,53 @@ export default defineConfig({
 })
 ```
 
+## Execution Context
+
+All database operations should run inside a `dbContext.run()` scope. This establishes the execution context that enables:
+- Transaction management
+- Request-scoped data (user ID, tenant ID, etc.)
+- PostgreSQL RLS via `set_config()`
+
+### HTTP Middleware Setup
+
+Wrap your HTTP requests in `dbContext.run()`:
+
+```typescript
+// start/kernel.ts or middleware
+import { dbContext } from 'adonisjs-kysely/services/main'
+import executionContext from 'adonisjs-kysely/services/execution_context'
+
+server.use([
+  async (ctx, next) => {
+    await dbContext.run({
+      executionContext: {
+        userId: { value: ctx.auth.user?.id, injectToDb: true },
+        requestId: { value: ctx.request.id(), injectToDb: false },
+      }
+    }, async () => {
+      await next()
+    })
+  }
+])
+```
+
+### CLI Commands
+
+Wrap command logic in `dbContext.run()`:
+
+```typescript
+export default class ProcessOrders extends BaseCommand {
+  async run() {
+    await dbContext.run(async () => {
+      // Command logic here
+    })
+  }
+}
+```
+
 ## Repository Pattern
 
-The recommended approach is to use the **repository pattern** for database operations. All queries must go through `getConnexion()` to enable proper transaction management.
+The recommended approach is to use the **repository pattern** for database operations. All queries must go through `getConnexion()` to ensure transaction awareness.
 
 ### Example Repository
 
@@ -159,29 +203,16 @@ export default class UsersController {
 
 ## Transaction Management
 
-`adonis-kysely` provides two transaction modes depending on your needs:
-
-### Automatic Transactions: `runInTransaction()`
-
-Use this for **simple, single-level transactions** where you want automatic commit/rollback handling.
-
-**Key characteristics:**
-- ✅ Automatically commits on success
-- ✅ Automatically rolls back on error
-- ✅ Simple and clean API
-- ❌ Cannot manually control commit/rollback
-- ❌ Creates only ONE transaction context (no nesting)
-
-**Example:**
+Use `kyselyDB.runInTransaction()` when you need atomicity:
 
 ```typescript
-import kyselyDB from 'adonis-kysely/services/main'
+import kyselyDB from 'adonisjs-kysely/services/main'
 
 export default class UserCreateController {
   async execute({ request, response }: HttpContext) {
     const payload = await request.validateUsing(validator)
 
-    await kyselyDB.runInTransaction(async () => {
+    const user = await kyselyDB.runInTransaction(async () => {
       // Create user
       const user = await this.userRepository.insert({
         email: payload.email,
@@ -199,116 +230,58 @@ export default class UserCreateController {
       // If any operation fails, everything is automatically rolled back
       // If all succeed, everything is automatically committed
 
-      return response.status(201).send({ user })
+      return user
     })
+
+    return response.status(201).send({ user })
   }
 }
 ```
-
-### Manual Nested Transactions: `startTransaction()`
-
-Use this when you need **fine-grained control** over transactions or **nested transactions** (savepoints).
 
 **Key characteristics:**
-- ✅ Full manual control over commit/rollback
-- ✅ Supports nested transactions via savepoints
-- ✅ Multiple transaction levels
-- ⚠️ You must manually commit or rollback
-- ⚠️ More verbose
+- Automatically commits on success
+- Automatically rolls back on error
+- Supports nesting (inner transactions become savepoints)
+- Works with `getConnexion()` - all queries inside use the transaction
 
-**Example: Simple Manual Transaction**
+### Nested Transactions
+
+Nested `runInTransaction()` calls create savepoints:
 
 ```typescript
-import kyselyDB from 'adonis-kysely/services/main'
+await kyselyDB.runInTransaction(async () => {
+  const user = await this.userRepository.insert({ ... })
 
-export default class UsersController {
-  async create({ request, response }: HttpContext) {
-    const transactionId = await kyselyDB.startTransaction()
-
-    try {
-      const user = await this.userRepository.insert({
-        email: request.input('email'),
-        username: request.input('username'),
-        password: request.input('password'),
-      })
-
-      // Manually commit when ready
-      await kyselyDB.commitTransaction(transactionId)
-
-      return response.status(201).json(user)
-    } catch (error) {
-      // Manually rollback on error
-      await kyselyDB.rollbackTransaction(transactionId)
-      throw error
-    }
+  try {
+    await kyselyDB.runInTransaction(async () => {
+      // This creates a savepoint
+      await this.roleRepository.insert({ user_id: user.id, ... })
+      throw new Error('Oops')
+    })
+  } catch {
+    // Savepoint rolled back, but user insert is still pending
   }
-}
+
+  // User will be committed
+})
 ```
 
-**Example: Nested Transactions (Savepoints)**
+## Request-Scoped Data
+
+Store request-scoped data using `executionContext`:
 
 ```typescript
-import kyselyDB from 'adonis-kysely/services/main'
+import executionContext from 'adonisjs-kysely/services/execution_context'
 
-export default class ComplexController {
-  async execute({ request, response }: HttpContext) {
-    // Start root transaction
-    const rootTxId = await kyselyDB.startTransaction()
+// In middleware - store data
+executionContext.set('userId', { value: user.id, injectToDb: true })
+executionContext.set('requestId', { value: requestId, injectToDb: false })
 
-    try {
-      // This uses the root transaction
-      const user = await this.userRepository.insert({
-        email: 'user@example.com',
-        username: 'john',
-        password: 'secret',
-      })
-
-      // Start nested transaction (savepoint)
-      const nestedTxId = await kyselyDB.startTransaction()
-
-      try {
-        // This uses the nested transaction
-        await this.roleRepository.insert({
-          user_id: user.id,
-          name: 'Admin',
-          permissions: JSON.stringify({ read: true, write: true }),
-        })
-
-        // Commit nested transaction
-        await kyselyDB.commitTransaction(nestedTxId)
-      } catch (error) {
-        // Rollback only the nested transaction (role creation)
-        // User creation is still pending in root transaction
-        await kyselyDB.rollbackTransaction(nestedTxId)
-        console.log('Role creation failed, but user creation continues')
-      }
-
-      // Commit root transaction
-      await kyselyDB.commitTransaction(rootTxId)
-
-      return response.status(201).json({ user })
-    } catch (error) {
-      // Rollback everything
-      await kyselyDB.rollbackTransaction(rootTxId)
-      return response.status(500).json({ error: 'Failed to create user' })
-    }
-  }
-}
+// In services/repositories - retrieve data
+const userId = executionContext.get<string>('userId')
 ```
 
-### Transaction ID Resolution
-
-Both `commitTransaction()` and `rollbackTransaction()` can automatically resolve the transaction ID:
-
-```typescript
-// Explicit ID (recommended for nested transactions)
-const txId = await kyselyDB.startTransaction()
-await kyselyDB.commitTransaction(txId)
-
-// Auto-resolve (uses most recent transaction)
-await kyselyDB.startTransaction()
-await kyselyDB.commitTransaction() // No ID needed
-```
+**`injectToDb: true`** makes the value available in PostgreSQL via `current_setting('app.userId')` - useful for RLS policies and audit triggers
 
 ## Best Practices
 
@@ -317,28 +290,52 @@ await kyselyDB.commitTransaction() // No ID needed
 All database queries must go through `getConnexion()` to ensure transaction awareness:
 
 ```typescript
-// ✅ Correct
+// ✅ Correct - call fresh each time
 kyselyDB.getConnexion().selectFrom('users').selectAll().execute()
 
-// ❌ Wrong - bypasses transaction system
-// Don't create a separate Kysely instance
+// ❌ Wrong - caching the connection
+class UserRepo {
+  private db = kyselyDB.getConnexion() // Don't cache!
+}
 ```
 
-### 2. Choose the Right Transaction Mode
+### 2. Wrap Entry Points in `dbContext.run()`
 
-| Scenario | Use |
-|----------|-----|
-| Simple operations with auto-commit/rollback | `runInTransaction()` |
-| Need manual control over commit timing | `startTransaction()` |
-| Nested transactions (savepoints) | `startTransaction()` |
-| Complex multi-step workflows with partial rollbacks | `startTransaction()` |
-
-### 3. Repository Pattern
-
-Encapsulate database logic in repositories for better organization and testability:
+HTTP requests, CLI commands, and background jobs should establish context:
 
 ```typescript
-// ✅ Good
+// ✅ HTTP middleware
+await dbContext.run(async () => {
+  await next()
+})
+
+// ✅ CLI command
+await dbContext.run(async () => {
+  // Command logic
+})
+
+// ✅ Background job
+await dbContext.run(async () => {
+  // Job logic
+})
+```
+
+### 3. Use `runInTransaction()` for Atomicity
+
+```typescript
+// ✅ When operations must succeed or fail together
+await kyselyDB.runInTransaction(async () => {
+  await createUser()
+  await createDefaultRole()
+  await sendWelcomeEmail()
+})
+```
+
+### 4. Repository Pattern
+
+Encapsulate database logic in repositories:
+
+```typescript
 export class UserRepository {
   async findByEmail(email: string) {
     return kyselyDB
@@ -349,56 +346,37 @@ export class UserRepository {
       .executeTakeFirst()
   }
 }
-
-// ✅ Use in controller
-const user = await userRepository.findByEmail('test@example.com')
 ```
 
-### 4. Error Handling
-
-Always handle errors appropriately in transactions:
-
-```typescript
-// With runInTransaction - automatic rollback
-await kyselyDB.runInTransaction(async () => {
-  // Operations here
-  // Errors automatically trigger rollback
-})
-
-// With startTransaction - manual rollback
-const txId = await kyselyDB.startTransaction()
-try {
-  // Operations here
-  await kyselyDB.commitTransaction(txId)
-} catch (error) {
-  await kyselyDB.rollbackTransaction(txId)
-  throw error
-}
-```
-
-### 5. Type Safety
-
-Keep your database types up to date:
+### 5. Keep Types Updated
 
 ```bash
 # Regenerate types after schema changes
 npx kysely-codegen --out-file=types/db.ts
 ```
 
-## Advanced: Transaction Context
+## API Reference
 
-For advanced use cases, you can access the transaction context:
+### `kyselyDB` (from `services/main`)
 
-```typescript
-import kyselyDB from 'adonis-kysely/services/main'
+| Method | Description |
+|--------|-------------|
+| `getConnexion()` | Get Kysely instance or current transaction |
+| `runInTransaction(callback)` | Execute callback in a transaction |
+| `destroy()` | Close database connection |
 
-// Get current transaction context
-const context = kyselyDB.getContext()
+### `dbContext` (from `services/main`)
 
-// List active transactions
-const activeTransactions = kyselyDB.listTransaction()
+| Method | Description |
+|--------|-------------|
+| `run(callback)` | Establish execution scope |
+| `run(options, callback)` | Establish scope with initial context |
+| `isActive()` | Check if inside a scope |
 
-// Get specific transaction
-const txId = await kyselyDB.startTransaction()
-const transaction = kyselyDB.getTransaction(txId)
-```
+### `executionContext` (from `services/execution_context`)
+
+| Method | Description |
+|--------|-------------|
+| `set(key, value)` | Store request-scoped data |
+| `get<T>(key)` | Retrieve scoped data |
+| `getAll()` | Get all context as object |

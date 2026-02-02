@@ -1,5 +1,5 @@
 import type { CommandOptions } from '@adonisjs/core/types/ace'
-import type { AdonisKyselyDB } from '#src/kysely_db'
+import type { KyselyManager } from '#src/kysely_db'
 
 import fs from 'node:fs/promises'
 import path from 'node:path'
@@ -14,7 +14,7 @@ export default class Seed extends BaseCommand {
     startApp: true,
   }
 
-  declare database: AdonisKyselyDB
+  declare database: KyselyManager
 
   /**
    * The complete lifecycle hook runs after the "run" method
@@ -42,7 +42,7 @@ export default class Seed extends BaseCommand {
   }
 
   async run() {
-    this.database = (await this.app.container.make('adonis-kysely')) as AdonisKyselyDB
+    this.database = (await this.app.container.make('adonis-kysely')) as KyselyManager
 
     const seedersPath = path.join(this.app.seedersPath())
     const files = await this.getSeedersFiles(seedersPath)
