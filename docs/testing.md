@@ -33,7 +33,7 @@ import { apiClient } from '@japa/api-client'
 import app from '@adonisjs/core/services/app'
 import type { Config } from '@japa/runner/types'
 import { pluginAdonisJS } from '@japa/plugin-adonisjs'
-import testUtils from '@adonisjs/core/services/test_utils'
+import kyselyTestUtils from '@adonisjs/core/services/test_utils'
 import kyselyTestUtils from 'adonisjs-kysely/services/test_utils'
 import kyselyDB from 'adonisjs-kysely/services/main'
 
@@ -72,7 +72,7 @@ export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
  */
 export const configureSuite: Config['configureSuite'] = (suite) => {
   if (['browser', 'functional', 'e2e'].includes(suite.name)) {
-    return suite.setup(() => testUtils.httpServer().start())
+    return suite.setup(() => kyselyTestUtils.httpServer().start())
   }
 }
 ```
@@ -80,10 +80,10 @@ export const configureSuite: Config['configureSuite'] = (suite) => {
 ### 2. Import Test Utils
 
 ```typescript
-import testUtils from 'adonisjs-kysely/services/test_utils'
+import kyselyTestUtils from 'adonisjs-kysely/services/test_utils'
 ```
 
-The `testUtils` service provides:
+The `kyselyTestUtils` service provides:
 - `migrate()` - Run database migrations
 - `db().seed()` - Run seeders
 - `startTransaction()` - Start test transaction
@@ -150,17 +150,17 @@ Each test should run in its own transaction to ensure isolation and automatic cl
 
 ```typescript
 import { test } from '@japa/runner'
-import testUtils from 'adonisjs-kysely/services/test_utils'
+import kyselyTestUtils from 'adonisjs-kysely/services/test_utils'
 
 test.group('User tests', (group) => {
   // Start transaction before each test
   group.each.setup(async () => {
-    await testUtils.startTransaction()
+    await kyselyTestUtils.startTransaction()
   })
 
   // Rollback transaction after each test
   group.each.teardown(async () => {
-    await testUtils.rollbackTransaction()
+    await kyselyTestUtils.rollbackTransaction()
   })
 
   test('create user', async ({ assert }) => {
@@ -189,17 +189,17 @@ With automatic rollback:
 
 ```typescript
 import { test } from '@japa/runner'
-import testUtils from 'adonisjs-kysely/services/test_utils'
+import kyselyTestUtils from 'adonisjs-kysely/services/test_utils'
 import kyselyDB from 'adonisjs-kysely/services/main'
 import { UserRepository } from '#app/repositories/user_repository'
 
 test.group('UserRepository', (group) => {
   group.each.setup(async () => {
-    await testUtils.startTransaction()
+    await kyselyTestUtils.startTransaction()
   })
 
   group.each.teardown(async () => {
-    await testUtils.rollbackTransaction()
+    await kyselyTestUtils.rollbackTransaction()
   })
 
   test('should create a new user', async ({ assert }) => {
@@ -273,16 +273,16 @@ test.group('UserRepository', (group) => {
 
 ```typescript
 import { test } from '@japa/runner'
-import testUtils from 'adonisjs-kysely/services/test_utils'
+import kyselyTestUtils from 'adonisjs-kysely/services/test_utils'
 import kyselyDB from 'adonisjs-kysely/services/main'
 
 test.group('User queries', (group) => {
   group.each.setup(async () => {
-    await testUtils.startTransaction()
+    await kyselyTestUtils.startTransaction()
   })
 
   group.each.teardown(async () => {
-    await testUtils.rollbackTransaction()
+    await kyselyTestUtils.rollbackTransaction()
   })
 
   test('should create user', async ({ assert }) => {
@@ -347,15 +347,15 @@ test.group('User queries', (group) => {
 
 ```typescript
 import { test } from '@japa/runner'
-import testUtils from 'adonisjs-kysely/services/test_utils'
+import kyselyTestUtils from 'adonisjs-kysely/services/test_utils'
 
 test.group('POST /users', (group) => {
   group.each.setup(async () => {
-    await testUtils.startTransaction()
+    await kyselyTestUtils.startTransaction()
   })
 
   group.each.teardown(async () => {
-    await testUtils.rollbackTransaction()
+    await kyselyTestUtils.rollbackTransaction()
   })
 
   test('should create user via API', async ({ client, assert }) => {
@@ -409,17 +409,17 @@ Use in tests:
 
 ```typescript
 import { test } from '@japa/runner'
-import testUtils from 'adonisjs-kysely/services/test_utils'
+import kyselyTestUtils from 'adonisjs-kysely/services/test_utils'
 import { UserRepository } from '#app/repositories/user_repository'
 import { userFixtures } from '#tests/fixtures/users.stub'
 
 test.group('Users with fixtures', (group) => {
   group.each.setup(async () => {
-    await testUtils.startTransaction()
+    await kyselyTestUtils.startTransaction()
   })
 
   group.each.teardown(async () => {
-    await testUtils.rollbackTransaction()
+    await kyselyTestUtils.rollbackTransaction()
   })
 
   test('should create multiple users', async ({ assert }) => {
@@ -442,11 +442,11 @@ test.group('Users with fixtures', (group) => {
 // ✅ Correct - with transactions
 test.group('Users', (group) => {
   group.each.setup(async () => {
-    await testUtils.startTransaction()
+    await kyselyTestUtils.startTransaction()
   })
 
   group.each.teardown(async () => {
-    await testUtils.rollbackTransaction()
+    await kyselyTestUtils.rollbackTransaction()
   })
 
   test('create user', async () => {
@@ -481,11 +481,11 @@ test('user', async () => {})
 // ✅ Good
 test.group('User deletion', (group) => {
   group.each.setup(async () => {
-    await testUtils.startTransaction()
+    await kyselyTestUtils.startTransaction()
   })
 
   group.each.teardown(async () => {
-    await testUtils.rollbackTransaction()
+    await kyselyTestUtils.rollbackTransaction()
   })
 
   test('should delete user', async ({ assert }) => {
@@ -510,11 +510,11 @@ test.group('User deletion', (group) => {
 ```typescript
 test.group('User creation', (group) => {
   group.each.setup(async () => {
-    await testUtils.startTransaction()
+    await kyselyTestUtils.startTransaction()
   })
 
   group.each.teardown(async () => {
-    await testUtils.rollbackTransaction()
+    await kyselyTestUtils.rollbackTransaction()
   })
 
   // Success case
@@ -586,16 +586,16 @@ If test data is persisting between tests:
 ```typescript
 // ✅ Correct - transaction wrapping
 group.each.setup(async () => {
-  await testUtils.startTransaction()
+  await kyselyTestUtils.startTransaction()
 })
 
 group.each.teardown(async () => {
-  await testUtils.rollbackTransaction() // Must call this!
+  await kyselyTestUtils.rollbackTransaction() // Must call this!
 })
 
 // ❌ Wrong - missing teardown
 group.each.setup(async () => {
-  await testUtils.startTransaction()
+  await kyselyTestUtils.startTransaction()
 })
 // No teardown = transaction never rolls back
 ```

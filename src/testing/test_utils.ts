@@ -18,16 +18,16 @@ import type { KyselyManager } from '../kysely/manager.js'
  *
  * @example
  * ```typescript
- * import testUtils from 'adonisjs-kysely/services/test_utils'
+ * import kyselyTestUtils from 'adonisjs-kysely/services/test_utils'
  *
  * // Setup test database
- * await testUtils.migrate()
- * await testUtils.db().seed('test')
+ * await kyselyTestUtils.migrate()
+ * await kyselyTestUtils.db().seed('test')
  *
  * // In each test: start transaction, run test, rollback
- * await testUtils.startTransaction()
+ * await kyselyTestUtils.startTransaction()
  * // ... test operations
- * await testUtils.rollbackTransaction()
+ * await kyselyTestUtils.rollbackTransaction()
  * ```
  */
 export class KyselyTestUtils {
@@ -117,12 +117,12 @@ export class KyselyTestUtils {
    * @example
    * ```typescript
    * // In test setup
-   * await testUtils.startTransaction()
+   * await kyselyTestUtils.startTransaction()
    *
    * // ... run test code, all DB operations use the transaction
    *
    * // In test teardown
-   * await testUtils.rollbackTransaction()
+   * await kyselyTestUtils.rollbackTransaction()
    * ```
    */
   async startTransaction(): Promise<string> {
@@ -184,12 +184,12 @@ export class KyselyTestUtils {
    * @example
    * ```typescript
    * // Simple usage (recommended)
-   * await testUtils.rollbackTransaction()
+   * await kyselyTestUtils.rollbackTransaction()
    *
    * // With explicit ID
-   * const txId = await testUtils.startTransaction()
+   * const txId = await kyselyTestUtils.startTransaction()
    * // ... test code
-   * await testUtils.rollbackTransaction(txId)
+   * await kyselyTestUtils.rollbackTransaction(txId)
    * ```
    */
   async rollbackTransaction(id?: string): Promise<void> {

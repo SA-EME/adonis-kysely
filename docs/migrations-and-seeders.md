@@ -225,7 +225,7 @@ database/seeders/
 Execute specific seeders first, in order:
 
 ```typescript
-await testUtils.db().seed(
+await kyselyTestUtils.db().seed(
   'test',
   ['users_seeder', 'roles_seeder'], // Run these first, in this order
   [] // No exclusions
@@ -237,7 +237,7 @@ await testUtils.db().seed(
 Skip certain seeders:
 
 ```typescript
-await testUtils.db().seed(
+await kyselyTestUtils.db().seed(
   'test',
   [], // No priority
   ['archived_', 'old_'] // Skip any seeder starting with these patterns
@@ -247,7 +247,7 @@ await testUtils.db().seed(
 #### Combined Example
 
 ```typescript
-await testUtils.db().seed(
+await kyselyTestUtils.db().seed(
   'test',
   ['users_seeder'], // Users first
   ['temp_', 'draft_'] // Skip temporary and draft seeders
