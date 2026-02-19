@@ -3,11 +3,11 @@ import { ExecutionContext } from '../context/execution_context.js'
 
 declare module '@adonisjs/core/types' {
   export interface ContainerBindings {
-    'adonis-kysely': KyselyManager
-    'adonis-kysely/execution-context': ExecutionContext
+    'adonisjs-kysely': KyselyManager
+    'adonisjs-kysely/execution-context': ExecutionContext
   }
 }
 
-declare module 'adonis-kysely/types/db' {
+declare module 'adonisjs-kysely/types/db' {
   export interface DB {}
 }

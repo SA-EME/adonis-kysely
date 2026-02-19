@@ -4,7 +4,7 @@ import app from '@adonisjs/core/services/app'
 let executionContext: ExecutionContext
 if (app) {
   await app.booted(async () => {
-    executionContext = await app.container.make('adonis-kysely/execution-context')
+    executionContext = await app.container.make('adonisjs-kysely/execution-context')
   })
 }
 

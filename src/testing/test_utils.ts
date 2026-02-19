@@ -3,7 +3,7 @@ import { promises as fs } from 'node:fs'
 import path from 'node:path'
 
 import type { ApplicationService } from '@adonisjs/core/types'
-import type { DB } from 'adonis-kysely/types/db'
+import type { DB } from 'adonisjs-kysely/types/db'
 import { KyselySeeder } from '../seeder/seeder.js'
 import { dbContext } from '../context/db_context.js'
 import type { KyselyManager } from '../kysely/manager.js'
@@ -18,7 +18,7 @@ import type { KyselyManager } from '../kysely/manager.js'
  *
  * @example
  * ```typescript
- * import testUtils from 'adonis-kysely/services/test_utils'
+ * import testUtils from 'adonisjs-kysely/services/test_utils'
  *
  * // Setup test database
  * await testUtils.migrate()

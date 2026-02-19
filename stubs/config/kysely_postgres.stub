@@ -4,7 +4,7 @@
 
 import pg from 'pg'
 import env from '#start/env'
-import { defineConfig } from 'adonis-kysely'
+import { defineConfig } from 'adonisjs-kysely'
 import { PostgresDialect } from 'kysely'
 {{#if hasLogging}}
 import { createKyselyLogger } from '#config/logs/kysely'

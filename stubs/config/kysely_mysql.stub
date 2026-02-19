@@ -4,7 +4,7 @@
 
 import { createPool } from 'mysql2'
 import env from '#start/env'
-import { defineConfig } from 'adonis-kysely'
+import { defineConfig } from 'adonisjs-kysely'
 import { MysqlDialect } from 'kysely'
 {{#if hasLogging}}
 import { createKyselyLogger } from '#config/logs/kysely'

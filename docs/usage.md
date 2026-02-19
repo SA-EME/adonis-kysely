@@ -1,6 +1,6 @@
 # Usage Guide
 
-This guide covers how to use `adonis-kysely` in your AdonisJS application to perform database operations with Kysely.
+This guide covers how to use `adonisjs-kysely` in your AdonisJS application to perform database operations with Kysely.
 
 ## Table of Contents
 
@@ -16,7 +16,7 @@ This guide covers how to use `adonis-kysely` in your AdonisJS application to per
 ## Installation
 
 ```bash
-node ace configure adonis-kysely
+node ace configure adonisjs-kysely
 ```
 
 This command will:
@@ -33,7 +33,7 @@ Add the following to your `tsconfig.json`:
 {
   "compilerOptions": {
     "paths": {
-      "adonis-kysely/types/db": ["./types/db.ts"]
+      "adonisjs-kysely/types/db": ["./types/db.ts"]
     }
   }
 }
@@ -52,7 +52,7 @@ Configure your database connection in `config/kysely.ts`:
 ```typescript
 import pg from 'pg'
 import env from '#start/env'
-import { defineConfig } from 'adonis-kysely'
+import { defineConfig } from 'adonisjs-kysely'
 import { PostgresDialect } from 'kysely'
 
 const { Pool } = pg
@@ -124,7 +124,7 @@ The recommended approach is to use the **repository pattern** for database opera
 ### Example Repository
 
 ```typescript
-import kyselyDB from 'adonis-kysely/services/main'
+import kyselyDB from 'adonisjs-kysely/services/main'
 
 export class UserRepository {
   all() {
@@ -172,7 +172,7 @@ export class UserRepository {
 For simple one-off queries without a repository:
 
 ```typescript
-import kyselyDB from 'adonis-kysely/services/main'
+import kyselyDB from 'adonisjs-kysely/services/main'
 
 const users = await kyselyDB.getConnexion().selectFrom('users').selectAll().execute()
 ```

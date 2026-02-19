@@ -3,7 +3,7 @@
     to: app.seedersPath(entity.path, seeder.fileName)
   })
 }}}
-import type { DB } from 'adonis-kysely/types/db'
+import type { DB } from 'adonisjs-kysely/types/db'
 import type { Kysely } from 'kysely'
 
 const tableName = '{{ seeder.tableName }}'

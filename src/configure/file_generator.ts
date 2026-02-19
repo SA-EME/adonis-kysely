@@ -21,6 +21,6 @@ export async function updateRcFile(
   codemods: Awaited<ReturnType<ConfigureCommand['createCodemods']>>
 ): Promise<void> {
   await codemods.updateRcFile((rcFile) => {
-    rcFile.addCommand('adonis-kysely/commands').addProvider('adonis-kysely/kysely_provider')
+    rcFile.addCommand('adonisjs-kysely/commands').addProvider('adonisjs-kysely/kysely_provider')
   })
 }

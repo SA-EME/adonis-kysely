@@ -42,7 +42,7 @@ export default class Seed extends BaseCommand {
   }
 
   async run() {
-    this.database = (await this.app.container.make('adonis-kysely')) as KyselyManager
+    this.database = (await this.app.container.make('adonisjs-kysely')) as KyselyManager
 
     const seedersPath = path.join(this.app.seedersPath())
     const files = await this.getSeedersFiles(seedersPath)

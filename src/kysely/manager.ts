@@ -1,4 +1,4 @@
-import type { DB } from 'adonis-kysely/types/db'
+import type { DB } from 'adonisjs-kysely/types/db'
 import { sql, type Kysely, type Transaction } from 'kysely'
 import { dbContext } from '../context/db_context.js'
 import executionContext, { type ExecutionContextValue } from '../context/execution_context.js'

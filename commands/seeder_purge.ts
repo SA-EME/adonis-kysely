@@ -1,5 +1,5 @@
 import type { CommandOptions } from '@adonisjs/core/types/ace'
-import type { DB } from 'adonis-kysely/types/db'
+import type { DB } from 'adonisjs-kysely/types/db'
 import type { KyselyManager } from '#src/kysely_db'
 
 import { BaseCommand, args } from '@adonisjs/core/ace'
@@ -59,7 +59,7 @@ export default class Seed extends BaseCommand {
   }
 
   async run() {
-    this.database = (await this.app.container.make('adonis-kysely')) as KyselyManager
+    this.database = (await this.app.container.make('adonisjs-kysely')) as KyselyManager
     this.tables = await this.database
       .getConnexion()
       // @ts-ignore

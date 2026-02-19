@@ -3,7 +3,7 @@
     to: app.migrationsPath(entity.path, migration.fileName)
   })
 }}}
-import type { DB } from 'adonis-kysely/types/db'
+import type { DB } from 'adonisjs-kysely/types/db'
 import type { Kysely } from 'kysely'
 
 const tableName = '{{ migration.tableName }}'

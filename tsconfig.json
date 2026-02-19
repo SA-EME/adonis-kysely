@@ -9,7 +9,7 @@
     "outDir": "./build",
     "baseUrl": ".",
     "paths": {
-      "adonis-kysely/types/db": ["types/db.ts"]
+      "adonisjs-kysely/types/db": ["types/db.ts"]
     }
   },
   "exclude": ["build", "node_modules"]

@@ -1,6 +1,6 @@
 # Testing Guide
 
-This guide covers how to write tests for your AdonisJS application using `adonis-kysely` with automatic transaction management.
+This guide covers how to write tests for your AdonisJS application using `adonisjs-kysely` with automatic transaction management.
 
 ## Table of Contents
 
@@ -14,7 +14,7 @@ This guide covers how to write tests for your AdonisJS application using `adonis
 
 ## Overview
 
-`adonis-kysely` provides automatic transaction wrapping in test mode to ensure:
+`adonisjs-kysely` provides automatic transaction wrapping in test mode to ensure:
 
 - **Test Isolation**: Each test runs in its own transaction
 - **No Data Persistence**: All changes are automatically rolled back after each test
@@ -34,8 +34,8 @@ import app from '@adonisjs/core/services/app'
 import type { Config } from '@japa/runner/types'
 import { pluginAdonisJS } from '@japa/plugin-adonisjs'
 import testUtils from '@adonisjs/core/services/test_utils'
-import kyselyTestUtils from 'adonis-kysely/services/test_utils'
-import kyselyDB from 'adonis-kysely/services/main'
+import kyselyTestUtils from 'adonisjs-kysely/services/test_utils'
+import kyselyDB from 'adonisjs-kysely/services/main'
 
 /**
  * Configure Japa plugins
@@ -80,7 +80,7 @@ export const configureSuite: Config['configureSuite'] = (suite) => {
 ### 2. Import Test Utils
 
 ```typescript
-import testUtils from 'adonis-kysely/services/test_utils'
+import testUtils from 'adonisjs-kysely/services/test_utils'
 ```
 
 The `testUtils` service provides:
@@ -150,7 +150,7 @@ Each test should run in its own transaction to ensure isolation and automatic cl
 
 ```typescript
 import { test } from '@japa/runner'
-import testUtils from 'adonis-kysely/services/test_utils'
+import testUtils from 'adonisjs-kysely/services/test_utils'
 
 test.group('User tests', (group) => {
   // Start transaction before each test
@@ -189,8 +189,8 @@ With automatic rollback:
 
 ```typescript
 import { test } from '@japa/runner'
-import testUtils from 'adonis-kysely/services/test_utils'
-import kyselyDB from 'adonis-kysely/services/main'
+import testUtils from 'adonisjs-kysely/services/test_utils'
+import kyselyDB from 'adonisjs-kysely/services/main'
 import { UserRepository } from '#app/repositories/user_repository'
 
 test.group('UserRepository', (group) => {
@@ -273,8 +273,8 @@ test.group('UserRepository', (group) => {
 
 ```typescript
 import { test } from '@japa/runner'
-import testUtils from 'adonis-kysely/services/test_utils'
-import kyselyDB from 'adonis-kysely/services/main'
+import testUtils from 'adonisjs-kysely/services/test_utils'
+import kyselyDB from 'adonisjs-kysely/services/main'
 
 test.group('User queries', (group) => {
   group.each.setup(async () => {
@@ -347,7 +347,7 @@ test.group('User queries', (group) => {
 
 ```typescript
 import { test } from '@japa/runner'
-import testUtils from 'adonis-kysely/services/test_utils'
+import testUtils from 'adonisjs-kysely/services/test_utils'
 
 test.group('POST /users', (group) => {
   group.each.setup(async () => {
@@ -409,7 +409,7 @@ Use in tests:
 
 ```typescript
 import { test } from '@japa/runner'
-import testUtils from 'adonis-kysely/services/test_utils'
+import testUtils from 'adonisjs-kysely/services/test_utils'
 import { UserRepository } from '#app/repositories/user_repository'
 import { userFixtures } from '#tests/fixtures/users.stub'
 

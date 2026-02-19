@@ -1,6 +1,6 @@
 # Commands Guide
 
-This guide covers all CLI commands provided by `adonis-kysely`.
+This guide covers all CLI commands provided by `adonisjs-kysely`.
 
 ## Table of Contents
 
@@ -57,7 +57,7 @@ database/migrations/1755697497022_create_users_table.ts
 
 **Template:**
 ```typescript
-import type { DB } from 'adonis-kysely/types/db'
+import type { DB } from 'adonisjs-kysely/types/db'
 import type { Kysely } from 'kysely'
 
 const tableName = 'users'
@@ -154,7 +154,7 @@ database/seeders/users_seeder.ts
 
 **Template:**
 ```typescript
-import type { DB } from 'adonis-kysely/types/db'
+import type { DB } from 'adonisjs-kysely/types/db'
 import type { Kysely } from 'kysely'
 
 export default async function seed(db: Kysely<DB>) {

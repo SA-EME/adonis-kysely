@@ -2,7 +2,7 @@ import fs from 'node:fs/promises'
 import path from 'node:path'
 import { Kysely } from 'kysely'
 import type { KyselyManager } from '../kysely/manager.js'
-import type { DB } from 'adonis-kysely/types/db'
+import type { DB } from 'adonisjs-kysely/types/db'
 import type { ApplicationService } from '@adonisjs/core/types'
 
 type SeederFunction = (db: Kysely<DB>) => Promise<void>

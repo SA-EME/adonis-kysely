@@ -28,7 +28,7 @@ export default class MigrateRollback extends BaseCommand {
    * instance
    */
   async prepare() {
-    this.database = (await this.app.container.make('adonis-kysely')) as KyselyManager
+    this.database = (await this.app.container.make('adonisjs-kysely')) as KyselyManager
     this.migrator = new Migrator({
       db: this.database.getConnexion(),
       provider: new FileMigrationProvider({

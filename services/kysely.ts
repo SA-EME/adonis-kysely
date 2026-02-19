@@ -4,7 +4,7 @@ import app from '@adonisjs/core/services/app'
 let kyselyDB: KyselyManager
 if (app) {
   await app.booted(async () => {
-    kyselyDB = await app.container.make('adonis-kysely')
+    kyselyDB = await app.container.make('adonisjs-kysely')
   })
 }
 

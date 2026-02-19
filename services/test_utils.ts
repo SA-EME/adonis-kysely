@@ -6,7 +6,7 @@ let kyselyDB: KyselyManager
 let kyselyTestUtils: KyselyTestUtils
 if (app) {
   await app.booted(async () => {
-    kyselyDB = await app.container.make('adonis-kysely')
+    kyselyDB = await app.container.make('adonisjs-kysely')
     kyselyTestUtils = new KyselyTestUtils(kyselyDB, app)
   })
 }

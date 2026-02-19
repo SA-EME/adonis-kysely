@@ -1,6 +1,6 @@
 import type { Kysely, Transaction } from 'kysely'
 import type { ExecutionContextValue } from './execution_context.js'
-import type { DB } from 'adonis-kysely/types/db'
+import type { DB } from 'adonisjs-kysely/types/db'
 
 import { AsyncLocalStorage } from 'node:async_hooks'
 

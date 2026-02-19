@@ -1,6 +1,6 @@
 # Migrations and Seeders Guide
 
-This guide covers database migrations and seeders patterns and examples with `adonis-kysely`.
+This guide covers database migrations and seeders patterns and examples with `adonisjs-kysely`.
 
 > **Note:** For CLI commands documentation, see the [Commands Guide](./commands.md).
 
@@ -188,7 +188,7 @@ Seeders populate your database with test or initial data.
 Every seeder must export a default function that accepts the Kysely database instance:
 
 ```typescript
-import type { DB } from 'adonis-kysely/types/db'
+import type { DB } from 'adonisjs-kysely/types/db'
 import type { Kysely } from 'kysely'
 
 export default async function seed(db: Kysely<DB>) {
@@ -259,7 +259,7 @@ await testUtils.db().seed(
 #### Example 1: Simple Insert
 
 ```typescript
-import type { DB } from 'adonis-kysely/types/db'
+import type { DB } from 'adonisjs-kysely/types/db'
 import type { Kysely } from 'kysely'
 
 export default async function seed(db: Kysely<DB>) {
@@ -276,7 +276,7 @@ export default async function seed(db: Kysely<DB>) {
 #### Example 2: Multiple Inserts
 
 ```typescript
-import type { DB } from 'adonis-kysely/types/db'
+import type { DB } from 'adonisjs-kysely/types/db'
 import type { Kysely } from 'kysely'
 
 export default async function seed(db: Kysely<DB>) {
@@ -305,7 +305,7 @@ export default async function seed(db: Kysely<DB>) {
 #### Example 3: Insert with Error Handling
 
 ```typescript
-import type { DB } from 'adonis-kysely/types/db'
+import type { DB } from 'adonisjs-kysely/types/db'
 import type { Kysely } from 'kysely'
 
 export default async function seed(db: Kysely<DB>) {
@@ -330,7 +330,7 @@ export default async function seed(db: Kysely<DB>) {
 #### Example 4: Conditional Insert (Idempotent)
 
 ```typescript
-import type { DB } from 'adonis-kysely/types/db'
+import type { DB } from 'adonisjs-kysely/types/db'
 import type { Kysely } from 'kysely'
 
 export default async function seed(db: Kysely<DB>) {
@@ -360,7 +360,7 @@ export default async function seed(db: Kysely<DB>) {
 #### Example 5: Insert with Relations
 
 ```typescript
-import type { DB } from 'adonis-kysely/types/db'
+import type { DB } from 'adonisjs-kysely/types/db'
 import type { Kysely } from 'kysely'
 
 export default async function seed(db: Kysely<DB>) {
@@ -416,7 +416,7 @@ Ensure your `tsconfig.json` includes:
 {
   "compilerOptions": {
     "paths": {
-      "adonis-kysely/types/db": ["./types/db.ts"]
+      "adonisjs-kysely/types/db": ["./types/db.ts"]
     }
   }
 }

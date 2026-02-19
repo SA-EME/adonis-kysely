@@ -17,7 +17,7 @@
 ## Installation
 
 ```bash
-node ace configure adonis-kysely
+node ace configure adonisjs-kysely
 ```
 
 This will:
@@ -34,7 +34,7 @@ Add to your `tsconfig.json`:
 {
   "compilerOptions": {
     "paths": {
-      "adonis-kysely/types/db": ["./types/db.ts"]
+      "adonisjs-kysely/types/db": ["./types/db.ts"]
     }
   }
 }
@@ -104,8 +104,8 @@ Tests wrap in transactions and auto-rollback - no data persists between tests.
 ### 1. Clone and Install
 
 ```bash
-git clone https://github.com/SA-EME/adonis-kysely
-cd adonis-kysely
+git clone https://github.com/SA-EME/adonisjs-kysely
+cd adonisjs-kysely
 npm install
 ```
 
@@ -116,12 +116,12 @@ npm run build
 npm pack
 ```
 
-This generates `adonis-kysely-x.x.x.tgz`
+This generates `adonisjs-kysely-x.x.x.tgz`
 
 ### 3. Install in Your Project
 
 ```bash
-npm install path/to/adonis-kysely-x.x.x.tgz
+npm install path/to/adonisjs-kysely-x.x.x.tgz
 ```
 
 ## Contributing
