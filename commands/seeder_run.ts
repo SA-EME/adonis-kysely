@@ -33,8 +33,10 @@ export default class Seed extends BaseCommand {
       if (file.isDirectory()) {
         const nestedFiles = await this.getSeedersFiles(fullPath)
         filesList = filesList.concat(nestedFiles)
-      } else if (file.name.endsWith('.ts')) {
-        filesList.push(fullPath)
+      } else if (file.name.endsWith('.ts') || file.name.endsWith('.js')) {
+        if (!file.name.endsWith('.map')) {
+          filesList.push(fullPath)
+        }
       }
     }
 
