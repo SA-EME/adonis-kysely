@@ -1,7 +1,7 @@
 {
   "name": "adonisjs-kysely",
   "description": "A kysely package to help adonisjs project",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "engines": {
     "node": ">=22.8.0"
   },
