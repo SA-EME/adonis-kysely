@@ -5,43 +5,22 @@ import path from 'node:path'
 import type { ApplicationService } from '@adonisjs/core/types'
 import { KyselySeeder } from '../seeder/seeder.js'
 import { KyselyManager } from '../kysely/manager.js'
+import { GlobalTransactionRegistry } from './global_transaction_registry.js'
 
-/**
- * Test utilities for AdonisJS applications using Kysely
- *
- * This class provides simplified database operations for testing:
- * - Running migrations
- * - Seeding test data
- * - Managing transactions (with automatic rollback for test isolation)
- *
- * @example
- * ```typescript
- * import kyselyTestUtils from 'adonisjs-kysely/services/test_utils'
- *
- * // Setup test database
- * await kyselyTestUtils.migrate()
- * await kyselyTestUtils.db().seed('test')
- *
- * // In each test: start transaction, run test, rollback
- * await kyselyTestUtils.startTransaction()
- * // ... test operations
- * await kyselyTestUtils.rollbackTransaction()
- * ```
- */
 export class KyselyTestUtils {
   #kyselyDB: KyselyManager
   #app: ApplicationService
   #seeder: KyselySeeder
+  #registry: GlobalTransactionRegistry
 
   constructor(kyselyDB: KyselyManager, app: ApplicationService) {
     this.#kyselyDB = kyselyDB
     this.#app = app
     this.#seeder = new KyselySeeder(kyselyDB, app)
+    this.#registry = new GlobalTransactionRegistry(kyselyDB.getDb())
+    kyselyDB.setTransactionRegistry(this.#registry)
   }
 
-  /**
-   * Run database migrations
-   */
   async migrate(): Promise<void> {
     const migrationFolder = this.#app.migrationsPath()
 
@@ -72,9 +51,6 @@ export class KyselyTestUtils {
     }
   }
 
-  /**
-   * Database utilities for seeding
-   */
   db() {
     return {
       seed: async (
@@ -99,18 +75,17 @@ export class KyselyTestUtils {
        * })
        */
       wrapInGlobalTransaction: async (): Promise<() => Promise<void>> => {
-        await this.#kyselyDB.beginGlobalTransaction()
-        return () => this.#kyselyDB.rollbackGlobalTransaction()
+        await this.#registry.begin()
+        return () => this.#registry.rollback()
       },
     }
   }
 
-  async startTransaction(): Promise<string> {
-    await this.#kyselyDB.beginGlobalTransaction()
-    return KyselyManager.DEFAULT_CONNECTION
+  async startTransaction(): Promise<void> {
+    await this.#registry.begin()
   }
 
   async rollbackTransaction(): Promise<void> {
-    await this.#kyselyDB.rollbackGlobalTransaction()
+    await this.#registry.rollback()
   }
 }
