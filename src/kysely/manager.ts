@@ -5,8 +5,67 @@ import executionContext, { type ExecutionContextValue } from '../context/executi
 
 export class KyselyManager {
   #savepointCounter = 0
+  #globalTransactions = new Map<string, Transaction<DB>>()
+  #globalTransactionsCompletion = new Map<
+    string,
+    {
+      rollback: () => void
+      completed: Promise<void>
+    }
+  >()
+
+  static readonly DEFAULT_CONNECTION = 'default'
 
   constructor(private readonly db: Kysely<DB>) {}
+
+  async beginGlobalTransaction(name = KyselyManager.DEFAULT_CONNECTION): Promise<void> {
+    if (this.#globalTransactions.has(name)) return
+
+    let signalRollback: () => void = () => {}
+    const rollbackSignal = new Promise<void>((resolve) => {
+      signalRollback = resolve
+    })
+
+    const completed = this.db
+      .transaction()
+      .execute(async (trx) => {
+        this.#globalTransactions.set(name, trx)
+        await rollbackSignal
+        this.#globalTransactions.delete(name)
+        throw new Error('__GLOBAL_TX_ROLLBACK__')
+      })
+      .catch((err) => {
+        if (err instanceof Error && err.message !== '__GLOBAL_TX_ROLLBACK__') throw err
+      })
+
+    this.#globalTransactionsCompletion.set(name, { rollback: signalRollback, completed })
+
+    await new Promise((resolve) => setImmediate(resolve))
+  }
+
+  async rollbackGlobalTransaction(name = KyselyManager.DEFAULT_CONNECTION): Promise<void> {
+    const slot = this.#globalTransactionsCompletion.get(name)
+    if (!slot) throw new Error(`No global transaction for "${name}"`)
+    slot.rollback()
+    await slot.completed
+    this.#globalTransactionsCompletion.delete(name)
+  }
+
+  getConnexion(): Kysely<DB> | Transaction<DB> {
+    const globalTrx = this.#globalTransactions.get(KyselyManager.DEFAULT_CONNECTION)
+    if (globalTrx) {
+      if (dbContext.isActive()) {
+        const nested = dbContext.getCurrentTransaction()
+        if (nested && nested !== globalTrx) return nested
+      }
+      return globalTrx
+    }
+
+    if (!dbContext.isActive()) return this.db
+    const trx = dbContext.getCurrentTransaction()
+    if (trx) return trx
+    return dbContext.getConnection() ?? this.db
+  }
 
   /**
    * Run a callback with execution context stored in AsyncLocalStorage.
@@ -71,18 +130,16 @@ export class KyselyManager {
     })
   }
 
-  getConnexion(): Kysely<DB> | Transaction<DB> {
-    if (!dbContext.isActive()) {
-      return this.db
+  async runInTransaction<T>(callback: () => Promise<T>): Promise<T> {
+    const globalTrx = this.#globalTransactions.get(KyselyManager.DEFAULT_CONNECTION)
+    if (globalTrx) {
+      if (!dbContext.isActive()) {
+        return dbContext.run(() => this.runInTransaction(callback))
+      }
+      const parent = dbContext.getCurrentTransaction() ?? globalTrx
+      return this.#runWithSavepoint(parent, callback)
     }
 
-    const trx = dbContext.getCurrentTransaction()
-    if (trx) return trx
-
-    return dbContext.getConnection() ?? this.db
-  }
-
-  async runInTransaction<T>(callback: () => Promise<T>): Promise<T> {
     if (!dbContext.isActive()) {
       return dbContext.run(() => this.runInTransaction(callback))
     }
