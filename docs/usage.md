@@ -20,6 +20,7 @@ node ace configure adonisjs-kysely
 ```
 
 This command will:
+
 - Create `config/kysely.ts` configuration file
 - Create `types/db.ts` stub for database types
 - Add `DATABASE_URL` to your environment variables
@@ -76,6 +77,7 @@ export default defineConfig({
 ## Execution Context
 
 All database operations should run inside a `dbContext.run()` scope. This establishes the execution context that enables:
+
 - Transaction management
 - Request-scoped data (user ID, tenant ID, etc.)
 - PostgreSQL RLS via `set_config()`
@@ -91,15 +93,18 @@ import executionContext from 'adonisjs-kysely/services/execution_context'
 
 server.use([
   async (ctx, next) => {
-    await dbContext.run({
-      executionContext: {
-        userId: { value: ctx.auth.user?.id, injectToDb: true },
-        requestId: { value: ctx.request.id(), injectToDb: false },
+    await dbContext.run(
+      {
+        executionContext: {
+          userId: { value: ctx.auth.user?.id, injectToDb: true },
+          requestId: { value: ctx.request.id(), injectToDb: false },
+        },
+      },
+      async () => {
+        await next()
       }
-    }, async () => {
-      await next()
-    })
-  }
+    )
+  },
 ])
 ```
 
@@ -239,6 +244,7 @@ export default class UserCreateController {
 ```
 
 **Key characteristics:**
+
 - Automatically commits on success
 - Automatically rolls back on error
 - Supports nesting (inner transactions become savepoints)
@@ -359,24 +365,24 @@ npx kysely-codegen --out-file=types/db.ts
 
 ### `kyselyDB` (from `services/main`)
 
-| Method | Description |
-|--------|-------------|
-| `getConnexion()` | Get Kysely instance or current transaction |
-| `runInTransaction(callback)` | Execute callback in a transaction |
-| `destroy()` | Close database connection |
+| Method                       | Description                                |
+| ---------------------------- | ------------------------------------------ |
+| `getConnexion()`             | Get Kysely instance or current transaction |
+| `runInTransaction(callback)` | Execute callback in a transaction          |
+| `destroy()`                  | Close database connection                  |
 
 ### `dbContext` (from `services/main`)
 
-| Method | Description |
-|--------|-------------|
-| `run(callback)` | Establish execution scope |
+| Method                   | Description                          |
+| ------------------------ | ------------------------------------ |
+| `run(callback)`          | Establish execution scope            |
 | `run(options, callback)` | Establish scope with initial context |
-| `isActive()` | Check if inside a scope |
+| `isActive()`             | Check if inside a scope              |
 
 ### `executionContext` (from `services/execution_context`)
 
-| Method | Description |
-|--------|-------------|
+| Method            | Description               |
+| ----------------- | ------------------------- |
 | `set(key, value)` | Store request-scoped data |
-| `get<T>(key)` | Retrieve scoped data |
-| `getAll()` | Get all context as object |
+| `get<T>(key)`     | Retrieve scoped data      |
+| `getAll()`        | Get all context as object |

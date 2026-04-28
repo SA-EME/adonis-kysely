@@ -84,11 +84,7 @@ export async function up(db: Kysely<any>): Promise<void> {
 }
 
 export async function down(db: Kysely<any>): Promise<void> {
-  await db.schema
-    .alterTable('users')
-    .dropColumn('bio')
-    .dropColumn('avatar_url')
-    .execute()
+  await db.schema.alterTable('users').dropColumn('bio').dropColumn('avatar_url').execute()
 }
 ```
 
@@ -101,9 +97,7 @@ export async function up(db: Kysely<any>): Promise<void> {
   await db.schema
     .createTable('roles')
     .addColumn('id', 'uuid', (col) => col.primaryKey())
-    .addColumn('user_id', 'uuid', (col) =>
-      col.references('users.id').onDelete('cascade').notNull()
-    )
+    .addColumn('user_id', 'uuid', (col) => col.references('users.id').onDelete('cascade').notNull())
     .addColumn('name', 'varchar', (col) => col.notNull())
     .addColumn('description', 'text')
     .addColumn('permissions', 'jsonb', (col) => col.notNull())
@@ -125,11 +119,7 @@ export async function down(db: Kysely<any>): Promise<void> {
 import type { Kysely } from 'kysely'
 
 export async function up(db: Kysely<any>): Promise<void> {
-  await db.schema
-    .createIndex('users_email_index')
-    .on('users')
-    .column('email')
-    .execute()
+  await db.schema.createIndex('users_email_index').on('users').column('email').execute()
 
   // Composite index
   await db.schema
@@ -214,6 +204,7 @@ database/seeders/
 ```
 
 **Naming Convention:**
+
 - Files must end with `_seeder.ts` or `_seeder.js`
 - Prefix with numbers for execution order (optional)
 - Use descriptive names: `users_seeder.ts`, not `seed1.ts`
@@ -450,7 +441,8 @@ export async function down(db: Kysely<any>): Promise<void> {
 // ✅ Good - focused migration
 // File: create_users_table.ts
 export async function up(db: Kysely<any>): Promise<void> {
-  await db.schema.createTable('users')
+  await db.schema
+    .createTable('users')
     // ... columns
     .execute()
 }
@@ -485,15 +477,10 @@ changes.ts
 // When adding a new NOT NULL column to existing table
 export async function up(db: Kysely<any>): Promise<void> {
   // Option 1: Add as nullable first
-  await db.schema
-    .alterTable('users')
-    .addColumn('status', 'varchar')
-    .execute()
+  await db.schema.alterTable('users').addColumn('status', 'varchar').execute()
 
   // Update existing rows
-  await db.updateTable('users')
-    .set({ status: 'active' })
-    .execute()
+  await db.updateTable('users').set({ status: 'active' }).execute()
 
   // Then make it NOT NULL
   await db.schema
@@ -553,22 +540,28 @@ database/seeders/
 ```typescript
 // ✅ Good - realistic test data
 export default async function seed(db: Kysely<DB>) {
-  await db.insertInto('users').values({
-    id: crypto.randomUUID(),
-    username: 'john_doe',
-    email: 'john@example.com',
-    created_at: new Date(),
-  }).execute()
+  await db
+    .insertInto('users')
+    .values({
+      id: crypto.randomUUID(),
+      username: 'john_doe',
+      email: 'john@example.com',
+      created_at: new Date(),
+    })
+    .execute()
 }
 
 // ❌ Bad - meaningless data
 export default async function seed(db: Kysely<DB>) {
-  await db.insertInto('users').values({
-    id: crypto.randomUUID(),
-    username: 'asdfasdf',
-    email: 'x@x.x',
-    created_at: new Date(),
-  }).execute()
+  await db
+    .insertInto('users')
+    .values({
+      id: crypto.randomUUID(),
+      username: 'asdfasdf',
+      email: 'x@x.x',
+      created_at: new Date(),
+    })
+    .execute()
 }
 ```
 

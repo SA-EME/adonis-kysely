@@ -21,6 +21,7 @@ node ace configure adonisjs-kysely
 ```
 
 This will:
+
 - Create `config/kysely.ts` configuration file
 - Create `types/db.ts` stub for database types
 - Add `DATABASE_URL` environment variable

@@ -33,14 +33,17 @@ await dbContext.run(async () => {
 ### With Initial Context
 
 ```typescript
-await dbContext.run({
-  executionContext: {
-    userId: { value: user.id, injectToDb: true },
-    tenantId: { value: tenant.id, injectToDb: true },
+await dbContext.run(
+  {
+    executionContext: {
+      userId: { value: user.id, injectToDb: true },
+      tenantId: { value: tenant.id, injectToDb: true },
+    },
+  },
+  async () => {
+    // userId and tenantId are immediately available
   }
-}, async () => {
-  // userId and tenantId are immediately available
-})
+)
 ```
 
 ### Idempotent Behavior
@@ -84,12 +87,12 @@ Store and retrieve request-scoped data.
 ```typescript
 executionContext.set('userId', {
   value: user.id,
-  injectToDb: true  // Makes available in PostgreSQL
+  injectToDb: true, // Makes available in PostgreSQL
 })
 
 executionContext.set('requestId', {
   value: crypto.randomUUID(),
-  injectToDb: false  // App-only, not in DB
+  injectToDb: false, // App-only, not in DB
 })
 ```
 
@@ -121,15 +124,18 @@ VALUES (current_setting('app.userId')::uuid);
 ```typescript
 server.use([
   async (ctx, next) => {
-    await dbContext.run({
-      executionContext: {
-        userId: { value: ctx.auth.user?.id, injectToDb: true },
-        tenantId: { value: ctx.tenant?.id, injectToDb: true },
+    await dbContext.run(
+      {
+        executionContext: {
+          userId: { value: ctx.auth.user?.id, injectToDb: true },
+          tenantId: { value: ctx.tenant?.id, injectToDb: true },
+        },
+      },
+      async () => {
+        await next()
       }
-    }, async () => {
-      await next()
-    })
-  }
+    )
+  },
 ])
 ```
 
@@ -179,26 +185,26 @@ class OrderService {
 
 ### dbContext
 
-| Method | Description |
-|--------|-------------|
-| `run(callback)` | Execute in context (idempotent) |
-| `run(options, callback)` | Execute with initial context |
+| Method                   | Description                                               |
+| ------------------------ | --------------------------------------------------------- |
+| `run(callback)`          | Execute in context (idempotent)                           |
+| `run(options, callback)` | Execute with initial context                              |
 | `runExclusive(callback)` | Execute only if not already in context (throws otherwise) |
-| `isActive()` | Check if inside a context |
+| `isActive()`             | Check if inside a context                                 |
 
 ### executionContext
 
-| Method | Description |
-|--------|-------------|
-| `set(key, value)` | Store data (throws if outside context) |
-| `get<T>(key)` | Get data (returns undefined if outside context) |
-| `getAll()` | Get all stored data |
+| Method            | Description                                     |
+| ----------------- | ----------------------------------------------- |
+| `set(key, value)` | Store data (throws if outside context)          |
+| `get<T>(key)`     | Get data (returns undefined if outside context) |
+| `getAll()`        | Get all stored data                             |
 
 ### Value Structure
 
 ```typescript
 interface ExecutionContextValue {
-  value: unknown      // The actual value
+  value: unknown // The actual value
   injectToDb: boolean // If true, available via current_setting('app.key')
 }
 ```

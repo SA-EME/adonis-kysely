@@ -14,24 +14,24 @@ This guide covers all CLI commands provided by `adonisjs-kysely`.
 
 ### Migration Commands
 
-| Command | Description |
-|---------|-------------|
-| `node ace make:migration <name>` | Create a new migration file |
-| `node ace migration:run` | Execute all pending migrations |
-| `node ace migration:rollback` | Rollback migrations |
+| Command                          | Description                    |
+| -------------------------------- | ------------------------------ |
+| `node ace make:migration <name>` | Create a new migration file    |
+| `node ace migration:run`         | Execute all pending migrations |
+| `node ace migration:rollback`    | Rollback migrations            |
 
 ### Seeder Commands
 
-| Command | Description |
-|---------|-------------|
-| `node ace make:seeder <name>` | Create a new seeder file |
-| `node ace seed:run` | Run all seeders |
+| Command                           | Description                 |
+| --------------------------------- | --------------------------- |
+| `node ace make:seeder <name>`     | Create a new seeder file    |
+| `node ace seed:run`               | Run all seeders             |
 | `node ace seed:purge [tableName]` | Delete all data from tables |
 
 ### Utility Commands
 
-| Command | Description |
-|---------|-------------|
+| Command                 | Description                                    |
+| ----------------------- | ---------------------------------------------- |
 | `node ace make:db-type` | Generate TypeScript types from database schema |
 
 ## Migration Commands
@@ -41,21 +41,25 @@ This guide covers all CLI commands provided by `adonisjs-kysely`.
 Creates a new migration file in `database/migrations/`.
 
 **Syntax:**
+
 ```bash
 node ace make:migration <name>
 ```
 
 **Example:**
+
 ```bash
 node ace make:migration users
 ```
 
 **Generated File:**
+
 ```
 database/migrations/1755697497022_create_users_table.ts
 ```
 
 **Template:**
+
 ```typescript
 import type { DB } from 'adonisjs-kysely/types/db'
 import type { Kysely } from 'kysely'
@@ -77,6 +81,7 @@ export async function down(db: Kysely<DB>) {
 ```
 
 **Naming:**
+
 - Converts to plural: `user` → `users`
 - Converts to snake_case: `userProfile` → `user_profiles`
 - Adds timestamp prefix
@@ -86,17 +91,20 @@ export async function down(db: Kysely<DB>) {
 Executes all pending migrations in chronological order.
 
 **Syntax:**
+
 ```bash
 node ace migration:run
 ```
 
 **Output:**
+
 ```
 ✅ migration "1755697497022_create_users_table" was executed successfully
 ✅ migration "1755698174800_create_roles_table" was executed successfully
 ```
 
 **What it does:**
+
 1. Scans `database/migrations/` for migration files
 2. Checks which migrations have been executed
 3. Runs pending migrations in order (oldest first)
@@ -107,26 +115,31 @@ node ace migration:run
 Rolls back previously executed migrations.
 
 **Syntax:**
+
 ```bash
 node ace migration:rollback [options]
 ```
 
 **Options:**
+
 - `--step=<number>` or `-s=<number>` - Number of migrations to rollback (default: 1)
 
 **Examples:**
 
 Rollback last migration:
+
 ```bash
 node ace migration:rollback
 ```
 
 Rollback last 3 migrations:
+
 ```bash
 node ace migration:rollback --step=3
 ```
 
 **Output:**
+
 ```
 ✅ migration "1759990056999_create_items_table" rolled back successfully
 ```
@@ -138,21 +151,25 @@ node ace migration:rollback --step=3
 Creates a new seeder file in `database/seeders/`.
 
 **Syntax:**
+
 ```bash
 node ace make:seeder <name>
 ```
 
 **Example:**
+
 ```bash
 node ace make:seeder users
 ```
 
 **Generated File:**
+
 ```
 database/seeders/users_seeder.ts
 ```
 
 **Template:**
+
 ```typescript
 import type { DB } from 'adonisjs-kysely/types/db'
 import type { Kysely } from 'kysely'
@@ -170,6 +187,7 @@ export default async function seed(db: Kysely<DB>) {
 ```
 
 **Naming:**
+
 - Converts to snake_case: `userProfile` → `user_profile_seeder.ts`
 - Adds `_seeder.ts` suffix
 
@@ -178,11 +196,13 @@ export default async function seed(db: Kysely<DB>) {
 Executes all seeder files in the `database/seeders/` directory (including subdirectories).
 
 **Syntax:**
+
 ```bash
 node ace seed:run
 ```
 
 **Output:**
+
 ```
 Executing: /path/to/database/seeders/users_seeder.ts
 Executing: /path/to/database/seeders/roles_seeder.ts
@@ -190,6 +210,7 @@ Seeding completed
 ```
 
 **What it does:**
+
 1. Recursively scans `database/seeders/` for `.ts` files
 2. Executes each seeder's default export function
 3. Runs all seeders regardless of subdirectory structure
@@ -201,6 +222,7 @@ Seeding completed
 Deletes all data from database tables (except migration tables).
 
 **Syntax:**
+
 ```bash
 node ace seed:purge [tableName]
 ```
@@ -208,16 +230,19 @@ node ace seed:purge [tableName]
 **Examples:**
 
 Purge all tables:
+
 ```bash
 node ace seed:purge
 ```
 
 Purge specific table:
+
 ```bash
 node ace seed:purge users
 ```
 
 **Output:**
+
 ```
 Purging table: users...
 ✅ Table "users" purged successfully.
@@ -227,6 +252,7 @@ Purging table: roles...
 ```
 
 **What it does:**
+
 - Deletes all rows from specified table(s)
 - Skips `kysely_migration` and `kysely_migration_lock` tables
 - Does NOT drop tables or reset sequences
@@ -240,27 +266,32 @@ Purging table: roles...
 Generates TypeScript types from your database schema using `kysely-codegen`.
 
 **Syntax:**
+
 ```bash
 node ace make:db-type
 ```
 
 **Output:**
+
 ```
 Generating database types with kysely-codegen...
 ✅ Database types generated successfully!
 ```
 
 **What it does:**
+
 - Runs `npx kysely-codegen --out-file=types/db.ts`
 - Generates TypeScript interfaces for your database tables
 - Creates type-safe database types in `types/db.ts`
 
 **Equivalent to:**
+
 ```bash
 npx kysely-codegen --out-file=types/db.ts
 ```
 
 **When to use:**
+
 - After running migrations
 - After modifying database schema
 - When types are out of sync with database
@@ -300,14 +331,13 @@ node ace make:db-type
 ```
 
 Example foreign key in roles migration:
+
 ```typescript
 export async function up(db: Kysely<DB>) {
   await db.schema
     .createTable('roles')
     .addColumn('id', 'uuid', (col) => col.primaryKey())
-    .addColumn('user_id', 'uuid', (col) =>
-      col.references('users.id').onDelete('cascade').notNull()
-    )
+    .addColumn('user_id', 'uuid', (col) => col.references('users.id').onDelete('cascade').notNull())
     .addColumn('name', 'varchar', (col) => col.notNull())
     .execute()
 }

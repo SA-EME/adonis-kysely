@@ -40,11 +40,7 @@ import kyselyDB from 'adonisjs-kysely/services/main'
 /**
  * Configure Japa plugins
  */
-export const plugins: Config['plugins'] = [
-  assert(),
-  apiClient(),
-  pluginAdonisJS(app)
-]
+export const plugins: Config['plugins'] = [assert(), apiClient(), pluginAdonisJS(app)]
 
 /**
  * Global setup/teardown hooks
@@ -84,6 +80,7 @@ import kyselyTestUtils from 'adonisjs-kysely/services/test_utils'
 ```
 
 The `kyselyTestUtils` service provides:
+
 - `migrate()` - Run database migrations
 - `db().seed()` - Run seeders
 - `startTransaction()` - Start test transaction
@@ -172,12 +169,14 @@ test.group('User tests', (group) => {
 ### Why Transaction Wrapping?
 
 Without transactions, tests would:
+
 - Persist data to the database
 - Cause conflicts between tests
 - Require manual cleanup
 - Run slower
 
 With automatic rollback:
+
 - ✅ Each test starts clean
 - ✅ No data leaks between tests
 - ✅ Faster execution
@@ -334,10 +333,7 @@ test.group('User queries', (group) => {
       assert.fail('Expected constraint violation')
     } catch (error: any) {
       assert.instanceOf(error, Error)
-      assert.include(
-        error.message,
-        'duplicate key value violates unique constraint'
-      )
+      assert.include(error.message, 'duplicate key value violates unique constraint')
     }
   })
 })
