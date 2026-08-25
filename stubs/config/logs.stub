@@ -3,35 +3,50 @@
 }}}
 
 import type { LogEvent } from 'kysely'
+import app from '@adonisjs/core/services/app'
 import logger from '@adonisjs/core/services/logger'
 
 /**
  * Kysely logging configuration
- * 
+ *
  * You can customize how database queries are logged by modifying the function below.
  * Available log levels: 'query', 'error'
+ *
+ * Query parameters carry the business data sent to the database, so they are
+ * only logged outside of production. Elsewhere just their count is reported,
+ * which is enough to match a log line against a query without leaking values.
  */
 
 export function createKyselyLogger() {
+  const logParameters = !app.inProduction
+
+  const parametersOf = (event: LogEvent) =>
+    logParameters
+      ? { parameters: event.query.parameters }
+      : { parametersCount: event.query.parameters.length }
+
   return (event: LogEvent): void => {
     if (event.level === 'query') {
       logger.debug(
-        'Query executed in ' + event.queryDurationMillis + 'ms: ' + event.query.sql,
         {
           sql: event.query.sql,
-          parameters: event.query.parameters,
+          ...parametersOf(event),
           duration: event.queryDurationMillis,
-        }
+        },
+        'Query executed in ' + event.queryDurationMillis + 'ms'
       )
     }
 
     if (event.level === 'error') {
-      logger.error('Query execution error', {
-        sql: event.query.sql,
-        parameters: event.query.parameters,
-        error: event.error,
-        duration: event.queryDurationMillis,
-      })
+      logger.error(
+        {
+          sql: event.query.sql,
+          ...parametersOf(event),
+          err: event.error,
+          duration: event.queryDurationMillis,
+        },
+        'Query execution error'
+      )
     }
   }
 }
