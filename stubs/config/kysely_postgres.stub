@@ -4,6 +4,7 @@
 
 import pg from 'pg'
 import env from '#start/env'
+import logger from '@adonisjs/core/services/logger'
 import { defineConfig } from 'adonisjs-kysely'
 import { PostgresDialect } from 'kysely'
 {{#if hasLogging}}
@@ -17,7 +18,19 @@ const pool = new Pool({
   user: env.get('DB_USER'),
   password: env.get('DB_PASSWORD'),
   database: env.get('DB_DATABASE'),
+  port: Number(env.get('DB_PORT')),
   max: 20,
+})
+
+/**
+ * pg reports the failure of an idle client as an `error` event on the pool.
+ * Without a listener node turns it into an unhandled error and the process
+ * exits, so a database restart would take the application down with it.
+ * With this listener the pool discards the dead client and recovers on its
+ * own once the database is back.
+ */
+pool.on('error', (error) => {
+  logger.error({ err: error }, 'Unexpected error on an idle postgres client')
 })
 
 const dialect = new PostgresDialect({ pool })

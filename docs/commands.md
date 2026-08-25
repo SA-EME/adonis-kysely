@@ -43,13 +43,31 @@ Creates a new migration file in `database/migrations/`.
 **Syntax:**
 
 ```bash
-node ace make:migration <name>
+node ace make:migration <name> [--create=<table>] [--table=<table>]
 ```
+
+**Flags:**
+
+| Flag               | Description                                   |
+| ------------------ | --------------------------------------------- |
+| `--create=<table>` | Generate a migration creating the given table |
+| `--table=<table>`  | Generate a migration altering the given table |
+
+The body is chosen as follows. An explicit flag always wins. Without a flag,
+only a name starting with `create_` yields a table skeleton — every other
+migration (extensions, indexes, constraints, backfills) gets an empty body.
+
+| Command                                     | Generated file                      | Body          |
+| ------------------------------------------- | ----------------------------------- | ------------- |
+| `make:migration create_users_table`         | `..._create_users_table.ts`         | `createTable` |
+| `make:migration create_users`               | `..._create_users.ts`               | `createTable` |
+| `make:migration add_slug --table=users`     | `..._add_slug.ts`                   | `alterTable`  |
+| `make:migration enable_required_extensions` | `..._enable_required_extensions.ts` | empty         |
 
 **Example:**
 
 ```bash
-node ace make:migration users
+node ace make:migration create_users_table
 ```
 
 **Generated File:**
@@ -82,9 +100,9 @@ export async function down(db: Kysely<DB>) {
 
 **Naming:**
 
-- Converts to plural: `user` → `users`
-- Converts to snake_case: `userProfile` → `user_profiles`
-- Adds timestamp prefix
+- The file keeps the name you passed, snake_cased, with a timestamp prefix
+- The inferred or given table name is pluralised and snake_cased:
+  `--create=userProfile` → `user_profiles`
 
 ### migration:run
 
