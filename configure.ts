@@ -13,23 +13,25 @@ import {
 } from './src/configure/package_manager.js'
 import { setupEnvironmentVariables } from './src/configure/environment_setup.js'
 import { generateConfigurationFiles, updateRcFile } from './src/configure/file_generator.js'
+import { ConfigureFlags } from './src/configure/flags.js'
 import type { DatabaseConfig } from './src/types/configure.js'
 
 export async function configure(command: ConfigureCommand) {
   const codemods = await command.createCodemods()
+  const flags = new ConfigureFlags(command)
 
-  const dialect = await selectDialect(command, command.parsedFlags.db)
+  const dialect = await selectDialect(command, flags)
 
   let databaseConfig: DatabaseConfig
   if (dialect === 'sqlite') {
-    databaseConfig = await collectSqliteConfig(command)
+    databaseConfig = await collectSqliteConfig(command, flags)
   } else {
-    databaseConfig = await collectNetworkDatabaseConfig(command, dialect)
+    databaseConfig = await collectNetworkDatabaseConfig(command, flags, dialect)
   }
 
-  const loggingOption = await selectLoggingOption(command)
+  const loggingOption = await selectLoggingOption(command, flags)
 
-  const shouldInstallPackages = await confirmPackageInstallation(command)
+  const shouldInstallPackages = await confirmPackageInstallation(command, flags)
   const requiredPackages = getRequiredPackages(dialect)
 
   if (shouldInstallPackages) {

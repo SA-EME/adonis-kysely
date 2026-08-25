@@ -26,6 +26,39 @@ This command will:
 - Add `DATABASE_URL` to your environment variables
 - Register the provider and commands in `.adonisrc.ts`
 
+#### Non-interactive setup
+
+Every prompt has a matching flag, so the command can run in CI or from a
+script. A flag skips its prompt; `--yes` takes the default for everything that
+was not passed, which makes the command run with no TTY at all.
+
+| Flag                         | Prompt it answers         | Default             |
+| ---------------------------- | ------------------------- | ------------------- |
+| `--db=<dialect>`             | Dialect                   | `postgres`          |
+| `--db-host=<host>`           | Host                      | `localhost`         |
+| `--db-port=<port>`           | Port                      | `5432` / `3306`     |
+| `--db-user=<user>`           | User                      | `postgres` / `root` |
+| `--db-password=<p>`          | Password                  | `postgres` / `root` |
+| `--db-name=<name>`           | Database name             | `database`          |
+| `--db-path=<path>`           | SQLite file (sqlite only) | `database.sqlite`   |
+| `--logging=<opt>`            | Logging option            | `adonisjs-logger`   |
+| `--install` / `--no-install` | Install the packages      | install             |
+| `--yes`                      | —                         | —                   |
+
+```bash
+# fully explicit
+node ace configure adonisjs-kysely \
+  --db=postgres --db-host=db --db-port=5432 \
+  --db-user=app --db-password=secret --db-name=app \
+  --logging=adonisjs-logger --install
+
+# defaults for everything else, no prompt at all
+node ace configure adonisjs-kysely --db=postgres --yes
+```
+
+An invalid value fails immediately rather than falling back to a prompt, so a
+typo in a script does not silently produce a different configuration.
+
 ### Generate Database Types
 
 Add the following to your `tsconfig.json`:

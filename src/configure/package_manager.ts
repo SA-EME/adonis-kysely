@@ -1,5 +1,6 @@
 import type ConfigureCommand from '@adonisjs/core/commands/configure'
 import type { SupportedDialect, PackageDependency } from '../types/configure.js'
+import type { ConfigureFlags } from './flags.js'
 
 const BASE_PACKAGES: PackageDependency[] = [
   {
@@ -45,7 +46,15 @@ export function getRequiredPackages(dialect: SupportedDialect): PackageDependenc
   return [...BASE_PACKAGES, ...DIALECT_PACKAGES[dialect]]
 }
 
-export async function confirmPackageInstallation(command: ConfigureCommand): Promise<boolean> {
+export async function confirmPackageInstallation(
+  command: ConfigureCommand,
+  flags: ConfigureFlags
+): Promise<boolean> {
+  const provided = flags.boolean('install')
+  if (provided !== undefined) return provided
+
+  if (flags.acceptDefaults) return true
+
   return await command.prompt.confirm(
     'Do you want to install the required packages for Adonis Kysely ?',
     {

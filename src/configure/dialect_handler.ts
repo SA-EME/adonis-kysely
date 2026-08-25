@@ -6,6 +6,7 @@ import type {
   LoggingOption,
   LoggingChoice,
 } from '../types/configure.js'
+import { resolveChoice, resolveOption, type ConfigureFlags } from './flags.js'
 
 const DIALECT_CHOICES: DialectChoice[] = [
   { name: 'postgres', message: 'Postgres' },
@@ -28,21 +29,23 @@ const DIALECT_DEFAULTS = {
 
 export async function selectDialect(
   command: ConfigureCommand,
-  flagDialect?: string
+  flags: ConfigureFlags
 ): Promise<SupportedDialect> {
-  return await command.prompt.choice(
-    'What database dialect you want to use with Adonis Kysely?',
-    DIALECT_CHOICES,
-    {
-      name: 'db',
-      default: flagDialect || 'postgres',
-    }
-  )
+  return resolveChoice(command, flags, {
+    flag: 'db',
+    message: 'What database dialect you want to use with Adonis Kysely?',
+    default: 'postgres',
+    choices: DIALECT_CHOICES,
+  })
 }
 
-export async function collectSqliteConfig(command: ConfigureCommand): Promise<DatabaseConfig> {
-  const dbPath = await command.prompt.ask('What is the path to your SQLite database file?', {
-    name: 'db_path',
+export async function collectSqliteConfig(
+  command: ConfigureCommand,
+  flags: ConfigureFlags
+): Promise<DatabaseConfig> {
+  const dbPath = await resolveOption(command, flags, {
+    flag: 'db-path',
+    message: 'What is the path to your SQLite database file?',
     default: 'database.sqlite',
   })
 
@@ -51,33 +54,39 @@ export async function collectSqliteConfig(command: ConfigureCommand): Promise<Da
 
 export async function collectNetworkDatabaseConfig(
   command: ConfigureCommand,
+  flags: ConfigureFlags,
   dialect: 'postgres' | 'mysql'
 ): Promise<DatabaseConfig> {
   const defaults = DIALECT_DEFAULTS[dialect]
 
-  const dbUser = await command.prompt.ask('What is the user of your database?', {
-    name: 'db_user',
+  const dbUser = await resolveOption(command, flags, {
+    flag: 'db-user',
+    message: 'What is the user of your database?',
     default: defaults.user,
   })
 
-  const dbPassword = await command.prompt.ask('What is the password of your database?', {
-    name: 'db_password',
+  const dbPassword = await resolveOption(command, flags, {
+    flag: 'db-password',
+    message: 'What is the password of your database?',
     default: defaults.password,
   })
 
-  const dbHost = await command.prompt.ask('What is the host of your database?', {
-    name: 'db_host',
+  const dbHost = await resolveOption(command, flags, {
+    flag: 'db-host',
+    message: 'What is the host of your database?',
     default: 'localhost',
   })
 
-  const dbPort = await command.prompt.ask('What is the port of your database?', {
-    name: 'db_port',
+  const dbPort = await resolveOption(command, flags, {
+    flag: 'db-port',
+    message: 'What is the port of your database?',
     default: defaults.port,
     validate: validatePortNumber,
   })
 
-  const dbName = await command.prompt.ask('What is the name of your database?', {
-    name: 'db_name',
+  const dbName = await resolveOption(command, flags, {
+    flag: 'db-name',
+    message: 'What is the name of your database?',
     default: 'database',
   })
 
@@ -105,13 +114,14 @@ const LOGGING_CHOICES: LoggingChoice[] = [
   { name: 'custom', message: 'Custom logging setup (wip)' },
 ]
 
-export async function selectLoggingOption(command: ConfigureCommand): Promise<LoggingOption> {
-  return await command.prompt.choice(
-    'What logging option would you like to use for database queries?',
-    LOGGING_CHOICES,
-    {
-      name: 'logging',
-      default: 'adonisjs-logger',
-    }
-  )
+export async function selectLoggingOption(
+  command: ConfigureCommand,
+  flags: ConfigureFlags
+): Promise<LoggingOption> {
+  return resolveChoice(command, flags, {
+    flag: 'logging',
+    message: 'What logging option would you like to use for database queries?',
+    default: 'adonisjs-logger',
+    choices: LOGGING_CHOICES,
+  })
 }
