@@ -2,6 +2,25 @@
 
 All notable changes to adonisjs-kysely are documented in this file.
 
+## [0.5.0] - 2026-08-26
+
+### Breaking Changes
+
+- Move kysely to a peer dependency and update the toolchain — 8c457dc — @KalvinVilla
+
+### Features
+
+- **Non-interactive configure** — add flags so configure can run non-interactively
+  - 4799d05 — @KalvinVilla
+
+### Fixes
+
+- Stop logging query parameters in production — 92a7683 — @KalvinVilla
+- Make the postgres stub and make:migration usable — bf079c0 — @KalvinVilla
+- Resolve begin() from inside the transaction callback — 6be8d76 — @KalvinVilla
+
+---
+
 ## [0.4.0] - 2026-04-28
 
 ### Features
