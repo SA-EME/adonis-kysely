@@ -1,10 +1,10 @@
-import { FileMigrationProvider, Migrator } from 'kysely'
+import { FileMigrationProvider, Migrator } from 'kysely/migration'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
 
 import type { ApplicationService } from '@adonisjs/core/types'
 import { KyselySeeder } from '../seeder/seeder.js'
-import { KyselyManager } from '../kysely/manager.js'
+import { type KyselyManager } from '../kysely/manager.js'
 import { GlobalTransactionRegistry } from './global_transaction_registry.js'
 
 export class KyselyTestUtils {

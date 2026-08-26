@@ -1,7 +1,7 @@
 import * as fs from 'node:fs/promises'
 import path from 'node:path'
 import { BaseCommand } from '@adonisjs/core/ace'
-import { Migrator } from 'kysely'
+import { Migrator } from 'kysely/migration'
 import kyselyDB from '../services/kysely.js'
 import { FileMigrationProvider } from '../src/file_migration_provider.js'
 import type { CommandOptions } from '@adonisjs/core/types/ace'

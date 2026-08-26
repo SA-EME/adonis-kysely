@@ -1,4 +1,4 @@
-import { InvalidArgumentsException } from '@poppinss/utils'
+import { InvalidArgumentsException } from '@poppinss/utils/exception'
 import type { AdonisKyselyConfig } from './types/main.js'
 
 export function defineConfig<T extends AdonisKyselyConfig>(config: T): T {

@@ -7,9 +7,8 @@
     "emitDeclarationOnly": false,
     "rootDir": "./",
     "outDir": "./build",
-    "baseUrl": ".",
     "paths": {
-      "adonisjs-kysely/types/db": ["types/db.ts"]
+      "adonisjs-kysely/types/db": ["./types/db.ts"]
     }
   },
   "exclude": ["build", "node_modules"]

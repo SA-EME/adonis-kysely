@@ -20,7 +20,7 @@ export default class MakeDbType extends BaseCommand {
       this.logger.success('Database types generated successfully!')
     } catch (error) {
       this.logger.error('Failed to generate database types')
-      this.logger.fatal(error)
+      this.logger.fatal(error instanceof Error ? error : String(error))
     }
   }
 }

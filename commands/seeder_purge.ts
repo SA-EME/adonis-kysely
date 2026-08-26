@@ -38,7 +38,7 @@ export default class Seed extends BaseCommand {
       await this.database.getConnexion().deleteFrom(tableName).execute()
       this.logger.success(`Table "${tableName}" purged successfully.`)
     } catch (error) {
-      this.logger.error(`Error purging table "${tableName}":`, error)
+      this.logger.error(`Error purging table "${tableName}": ${toMessage(error)}`)
     }
   }
 
@@ -54,7 +54,7 @@ export default class Seed extends BaseCommand {
 
       this.logger.success('All tables purged successfully.')
     } catch (error) {
-      this.logger.error('Error purging all tables:', error)
+      this.logger.error(`Error purging all tables: ${toMessage(error)}`)
     }
   }
 
@@ -82,4 +82,8 @@ export default class Seed extends BaseCommand {
       await this.purgeTable(this.tableName as keyof DB)
     }
   }
+}
+
+function toMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error)
 }

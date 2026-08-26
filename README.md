@@ -14,6 +14,12 @@
 - ✅ **Migration & Seeding**: Kysely-based migrations and flexible seeding system
 - ✅ **PostgreSQL Support**: Optimized for PostgreSQL with `set_config()` integration
 
+## Requirements
+
+- Node.js >= 24 (required by AdonisJS 7)
+- AdonisJS >= 7
+- Kysely >= 0.29 (peer dependency, see below)
+
 ## Installation
 
 ```bash
@@ -26,6 +32,12 @@ This will:
 - Create `types/db.ts` stub for database types
 - Add `DATABASE_URL` environment variable
 - Register provider and commands in `.adonisrc.ts`
+
+`kysely` is a peer dependency: it must be installed in your application, and
+there must be a single copy of it. Its types cross the package boundary, so two
+copies make nominally distinct classes and a `PostgresDialect` built in your
+app stops being assignable to the one this package expects. `configure`
+installs it for you.
 
 ### Generate Database Types
 

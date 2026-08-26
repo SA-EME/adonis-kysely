@@ -26,6 +26,12 @@ This command will:
 - Add `DATABASE_URL` to your environment variables
 - Register the provider and commands in `.adonisrc.ts`
 
+`kysely` is a peer dependency: it must be installed in your application, and
+there must be a single copy of it. Its types cross the package boundary, so two
+copies make nominally distinct classes and a `PostgresDialect` built in your
+app stops being assignable to the one this package expects. `configure`
+installs it for you.
+
 #### Non-interactive setup
 
 Every prompt has a matching flag, so the command can run in CI or from a

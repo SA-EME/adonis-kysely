@@ -5,7 +5,7 @@ import * as fs from 'node:fs/promises'
 import path from 'node:path'
 
 import { BaseCommand } from '@adonisjs/core/ace'
-import { FileMigrationProvider, Migrator } from 'kysely'
+import { FileMigrationProvider, Migrator } from 'kysely/migration'
 
 export default class MigrationRun extends BaseCommand {
   static commandName = 'migration:run'

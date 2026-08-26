@@ -1,5 +1,5 @@
-import { KyselyManager } from '../kysely/manager.js'
-import { ExecutionContext } from '../context/execution_context.js'
+import { type KyselyManager } from '../kysely/manager.js'
+import { type ExecutionContext } from '../context/execution_context.js'
 
 declare module '@adonisjs/core/types' {
   export interface ContainerBindings {
